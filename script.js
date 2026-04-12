@@ -1,261 +1,443 @@
+/* ═══════════════════════════════════════════════════════════
+   XBzin Ecosystem — Admin Dashboard
+   script.js  |  Pure JS, Chart.js integration, UI logic
+   ═══════════════════════════════════════════════════════════ */
 
-(function() {
-  // Wait for Lenis to be available with fallback smooth scroll
-  let lenis;
-  const initLenis = () => {
-    if (typeof Lenis !== 'undefined') {
-      lenis = new Lenis({ lerp: 0.085, smoothWheel: true });
-      lenis.on('scroll', ScrollTrigger.update);
-      gsap.ticker.add((time) => { if (lenis) lenis.raf(time * 1000); });
-    } else {
-      // Fallback: use default scroll, but still update ScrollTrigger
-      window.addEventListener('scroll', () => ScrollTrigger.update());
-    }
-  };
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initLenis);
+'use strict';
+
+/* ────────────────────────────────────
+   UTILITY: DOM helpers
+──────────────────────────────────── */
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+
+/* ────────────────────────────────────
+   SIDEBAR TOGGLE
+──────────────────────────────────── */
+const sidebar      = $('#sidebar');
+const mainWrapper  = $('#mainWrapper');
+const menuToggle   = $('#menuToggle');
+const sidebarClose = $('#sidebarClose');
+const overlay      = $('#overlay');
+
+let isMobile = () => window.innerWidth <= 768;
+
+function openSidebar () {
+  if (isMobile()) {
+    sidebar.classList.add('open');
+    overlay.classList.add('active');
   } else {
-    initLenis();
+    // Desktop: toggle collapse
+    sidebar.classList.toggle('collapsed');
+    mainWrapper.classList.toggle('collapsed-layout');
   }
-  
-  gsap.ticker.lagSmoothing(0);
-  gsap.registerPlugin(ScrollTrigger);
-})();
+}
 
-/* ── HAMBURGER MENU TOGGLE (CSS class toggle, no inline JS style abuse) ── */
-const hamburger = document.querySelector('.hamburger');
-const navLinks = document.querySelector('.nav-links');
-if (hamburger && navLinks) {
-  const mobileMenuClass = 'nav-links-mobile';
-  const styleSheet = document.createElement('style');
-  styleSheet.textContent = `
-    .nav-links-mobile {
-      display: flex !important;
-      flex-direction: column;
-      position: absolute;
-      top: 70px;
-      right: 5%;
-      background-color: var(--cream);
-      padding: 1.5rem;
-      gap: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      z-index: 1000;
-    }
-    @media (min-width: 769px) {
-      .nav-links-mobile {
-        display: flex !important;
-        flex-direction: row;
-        position: static;
-        background-color: transparent;
-        padding: 0;
-        box-shadow: none;
-      }
-    }
-  `;
-  document.head.appendChild(styleSheet);
-  
-  hamburger.addEventListener('click', (e) => {
-    e.stopPropagation();
-    navLinks.classList.toggle('nav-links-mobile');
+function closeSidebar () {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('active');
+}
+
+menuToggle.addEventListener('click', openSidebar);
+sidebarClose.addEventListener('click', closeSidebar);
+overlay.addEventListener('click', closeSidebar);
+
+// Close on resize if opened in mobile
+window.addEventListener('resize', () => {
+  if (!isMobile()) closeSidebar();
+});
+
+/* ────────────────────────────────────
+   ACTIVE NAV LINK + BREADCRUMB
+──────────────────────────────────── */
+const navLinks      = $$('.nav-link[data-section]');
+const breadcrumbEl  = $('#breadcrumbActive');
+
+navLinks.forEach(link => {
+  link.addEventListener('click', function (e) {
+    // Remove active from all
+    navLinks.forEach(l => l.classList.remove('active'));
+    this.classList.add('active');
+
+    // Update breadcrumb
+    const sectionName = this.querySelector('span').textContent;
+    breadcrumbEl.textContent = sectionName;
+
+    // Close sidebar on mobile after click
+    if (isMobile()) closeSidebar();
   });
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-      navLinks.classList.remove('nav-links-mobile');
+});
+
+// Highlight nav based on scroll position
+const sections = $$('section[id]');
+
+function highlightNavOnScroll () {
+  let current = '';
+  sections.forEach(sec => {
+    const top = sec.offsetTop - 100;
+    if (window.scrollY >= top) current = sec.id;
+  });
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.dataset.section === current) {
+      link.classList.add('active');
+      breadcrumbEl.textContent = link.querySelector('span').textContent;
     }
   });
 }
 
-/* ── ABOUT END REVEAL (single ScrollTrigger) ── */
-ScrollTrigger.create({
-  trigger: '#about-end',
-  start: 'top 70%',
-  onEnter: () => document.getElementById('about-end').classList.add('visible'),
-  onLeaveBack: () => document.getElementById('about-end').classList.remove('visible'),
+window.addEventListener('scroll', highlightNavOnScroll, { passive: true });
+
+/* ────────────────────────────────────
+   NOTIFICATION DROPDOWN
+──────────────────────────────────── */
+const notifBtn       = $('#notifBtn');
+const notifDropdown  = $('#notifDropdown');
+
+notifBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  notifDropdown.classList.toggle('open');
 });
 
-/* ── PROJECTS HORIZONTAL ── */
-(function(){
-  const container = document.getElementById('projectsContainer');
-  const section   = document.getElementById('projectsScrollSection');
-  const label     = document.getElementById('projProgress');
-  if (!container || !section) return;
-  function getAmt(){ return -(container.scrollWidth - window.innerWidth); }
-  gsap.to(container, {
-    x: getAmt,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: section,
-      pin: true,
-      start: 'top top',
-      end: () => '+=' + (-getAmt()),
-      scrub: true,
-      invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        const p = (self.progress * 100).toFixed(0).padStart(2,'0');
-        if(label) label.textContent = '('+p+'%)';
-      }
+document.addEventListener('click', () => {
+  notifDropdown.classList.remove('open');
+});
+
+/* ────────────────────────────────────
+   KPI COUNTER ANIMATION
+──────────────────────────────────── */
+function animateCounter (el, target, duration = 1200) {
+  let start = 0;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) {
+      el.textContent = target;
+      clearInterval(timer);
+    } else {
+      el.textContent = Math.floor(start);
+    }
+  }, 16);
+}
+
+// Intersection observer — animate when visible
+const counterEls = $$('[data-count]');
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      animateCounter(el, parseInt(el.dataset.count, 10));
+      counterObserver.unobserve(el);
     }
   });
-})();
+}, { threshold: 0.4 });
 
-/* ── WEBGL PIXEL REVEAL (only renders when section enters view, hidden on small screens) ── */
-(function(){
-  const isSmallScreen = window.innerWidth < 768 || window.innerHeight < 600;
-  const stage = document.getElementById('webglStage');
-  if (!stage) return;
-  
-  if (isSmallScreen) {
-    stage.style.background = '#000';
-    stage.style.display = 'block';
-    const canvasEl = stage.querySelector('canvas');
-    if (canvasEl) canvasEl.style.display = 'none';
-    const imgEl = stage.querySelector('img');
-    if (imgEl) imgEl.style.display = 'none';
-    return;
-  }
+counterEls.forEach(el => counterObserver.observe(el));
 
-  const lerp=(a,b,t)=>a+(b-a)*t;
-  const damp=(a,b,lambda,dt)=>lerp(a,b,1-Math.exp(-lambda*dt));
+/* ────────────────────────────────────
+   CHART.JS — GLOBAL DEFAULTS
+──────────────────────────────────── */
+Chart.defaults.font.family = "'Poppins', sans-serif";
+Chart.defaults.font.size   = 12;
+Chart.defaults.color       = '#6b7280';
+Chart.defaults.plugins.legend.display = false; // We use custom legends
 
-  const vert=`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position,1.0);}`;
-  const fragBase=`precision highp float;uniform sampler2D uTexture;uniform vec2 uImageSize;uniform vec2 uPlaneSize;varying vec2 vUv;vec2 coverUv(vec2 uv,vec2 img,vec2 plane){float ia=img.x/img.y;float pa=plane.x/plane.y;vec2 s=vec2(1.0);if(pa>ia)s.y=ia/pa;else s.x=pa/ia;return(uv-0.5)*s+0.5;}void main(){vec2 uv=coverUv(vUv,uImageSize,uPlaneSize);uv=clamp(uv,0.0,1.0);gl_FragColor=texture2D(uTexture,uv);}`;
-  const fragCover=`precision highp float;uniform float uProgress;uniform float uRawProgress;uniform float uPixelSize;uniform float uTime;uniform vec2 uPlaneSize;uniform sampler2D uChars;uniform float uCharCount;varying vec2 vUv;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123);}float hash3(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453123);}void main(){vec2 gridSize=uPlaneSize/uPixelSize;vec2 pixelId=floor(vUv*gridSize);vec2 gridUv=pixelId/gridSize;vec2 gridFrac=fract(vUv*gridSize);float blockRand=hash(pixelId);float progressY=1.0-gridUv.y;float rowRand=hash(vec2(0.0,pixelId.y));float delay=progressY+0.35*blockRand+0.05*rowRand;float blockReveal=uProgress-delay;float softEdge=0.025;float blockAlpha=1.0-smoothstep(-softEdge,softEdge,blockReveal);if(blockAlpha<0.004)discard;float timeFlicker=floor(uTime*8.0);float charIndex=floor(hash3(vec3(pixelId,timeFlicker))*uCharCount);float fontMargin=0.08+0.08*hash(pixelId+17.3);vec2 charUV=vec2(gridFrac.x*(1.0-2.0*fontMargin)+fontMargin,(charIndex+gridFrac.y)/uCharCount);float letterMask=texture2D(uChars,charUV).r;float letterAppearBase=-0.20;float letterAppearThresh=letterAppearBase+0.07*blockRand;float letterShow=smoothstep(letterAppearThresh,0.0,blockReveal)*blockAlpha;letterShow*=step(0.002,uProgress);float thresh=0.28+0.10*hash(pixelId+333.0);float letterAlpha=smoothstep(thresh-0.08,thresh+0.08,letterMask)*pow(max(letterShow,0.0),0.65+0.3*hash(pixelId+544.0));if(letterAlpha<0.4&&hash(pixelId+uRawProgress*7.577)>0.62){float charIndex2=mod(charIndex+1.0,uCharCount);vec2 charUV2=vec2(charUV.x,(charIndex2+gridFrac.y)/uCharCount);float letterMask2=texture2D(uChars,charUV2).r;float letterAlpha2=smoothstep(thresh-0.08,thresh+0.08,letterMask2)*letterShow;letterAlpha=max(letterAlpha,letterAlpha2*0.55);}float lightness=0.03+0.04*hash(pixelId+77.0);vec3 blockColor=vec3(lightness);vec3 glyphBase=mix(vec3(0.85,0.86,0.92),vec3(0.98,0.97,0.95),hash(pixelId+149.0));vec3 glyphColor=mix(glyphBase,vec3(1.0),0.18+0.24*hash(pixelId+999.0));vec2 cellCenter=gridFrac-0.5;float innerVig=1.0-smoothstep(0.3,0.5,length(cellCenter));blockColor*=0.7+0.3*innerVig;vec3 finalRgb=mix(blockColor,glyphColor,letterAlpha);float finalAlpha=blockAlpha;gl_FragColor=vec4(finalRgb,finalAlpha);}`;
+/* ── Color palette for charts ── */
+const C = {
+  green:  '#22c55e',
+  yellow: '#f5b800',
+  red:    '#e84040',
+  blue:   '#2563eb',
+  black:  '#111111',
+};
 
-  const CHARS=['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','#','@','!','?','%','&','*','+','-','=','~','^','░','▒','▓','█','■','□'];
-  const img=document.getElementById('sourceImg');
-  const display=document.getElementById('progressDisplay');
-
-  function buildAtlas(chars,cellPx=96){
-    const c=document.createElement('canvas');
-    c.width=cellPx;c.height=cellPx*chars.length;
-    const ctx=c.getContext('2d');
-    ctx.fillStyle='#000';ctx.fillRect(0,0,c.width,c.height);
-    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.font=`bold ${Math.round(cellPx*0.70)}px "Courier New",monospace`;
-    chars.forEach((ch,i)=>ctx.fillText(ch,cellPx/2,cellPx*i+cellPx/2));
-    return c;
-  }
-
-  function waitImg(el){return new Promise(res=>{if(el.complete&&el.naturalWidth)return res(el);el.onload=el.onerror=()=>res(el);});}
-
-  let isWebGLActive = false;
-  
-  async function boot(){
-    await waitImg(img);
-    const W=stage.clientWidth,H=stage.clientHeight;
-    const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-    renderer.setSize(W,H);renderer.autoClear=false;renderer.sortObjects=false;
-    stage.appendChild(renderer.domElement);
-    const scene=new THREE.Scene();
-    const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
-    const geo=new THREE.PlaneGeometry(2,2);
-    const imgTex=new THREE.Texture(img);
-    imgTex.needsUpdate=true;imgTex.minFilter=THREE.LinearFilter;imgTex.magFilter=THREE.LinearFilter;imgTex.generateMipmaps=false;
-    const baseMat=new THREE.ShaderMaterial({vertexShader:vert,fragmentShader:fragBase,uniforms:{uTexture:{value:imgTex},uImageSize:{value:new THREE.Vector2(img.naturalWidth||2000,img.naturalHeight||1333)},uPlaneSize:{value:new THREE.Vector2(W,H)}},depthTest:false});
-    scene.add(new THREE.Mesh(geo,baseMat));
-    const atlasCvs=buildAtlas(CHARS,96);
-    const charsTex=new THREE.CanvasTexture(atlasCvs);
-    charsTex.minFilter=THREE.LinearFilter;charsTex.magFilter=THREE.LinearFilter;charsTex.generateMipmaps=false;
-    const coverMat=new THREE.ShaderMaterial({vertexShader:vert,fragmentShader:fragCover,uniforms:{uProgress:{value:0.0},uRawProgress:{value:0.0},uPixelSize:{value:20.0},uTime:{value:0.0},uPlaneSize:{value:new THREE.Vector2(W,H)},uChars:{value:charsTex},uCharCount:{value:CHARS.length}},transparent:true,depthWrite:false,depthTest:false});
-    scene.add(new THREE.Mesh(geo,coverMat));
-    window.addEventListener('resize',()=>{
-      const w=stage.clientWidth,h=stage.clientHeight;
-      renderer.setSize(w,h);
-      baseMat.uniforms.uPlaneSize.value.set(w,h);
-      coverMat.uniforms.uPlaneSize.value.set(w,h);
-    });
-    let rawProgress=0,smoothProgress=0;
-    ScrollTrigger.create({
-      trigger: stage,
-      start: 'top bottom',
-      end: 'bottom top',
-      onUpdate(self){ rawProgress=gsap.utils.clamp(0,1,(self.progress-0.05)/0.85); }
-    });
-    let prevTime=0;
-    function loop(time){
-      requestAnimationFrame(loop);
-      const dt=Math.min((time-prevTime)/1000,0.05);prevTime=time;
-      ScrollTrigger.update();
-      smoothProgress=damp(smoothProgress,rawProgress,6.5,dt);
-      coverMat.uniforms.uProgress.value=smoothProgress;
-      coverMat.uniforms.uRawProgress.value=rawProgress;
-      coverMat.uniforms.uTime.value=time*0.001;
-      const pct=Math.round(smoothProgress*100);
-      if(display) display.textContent=pct+'%';
-      if(display) display.style.color=smoothProgress>0.5?'rgba(255,255,255,0.12)':'rgba(255,255,255,0.25)';
-      renderer.clear();renderer.render(scene,camera);
-    }
-    requestAnimationFrame(loop);
-  }
-  
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !isWebGLActive) {
-        isWebGLActive = true;
-        boot();
-        observer.disconnect();
-      }
-    });
-  }, { threshold: 0.1 });
-  observer.observe(stage);
-})();
-
-/* ── SKILLS LIST SCROLL (safe checks) ── */
-(function(){
-  const listWrapper=document.getElementById('skillsListWrapper');
-  const section=document.getElementById('skillsSection');
-  const items=document.querySelectorAll('.skill-item');
-  if(!items.length || !listWrapper || !section) return;
-  const preview=document.getElementById('skillPreview');
-  const itemH=items[0].offsetHeight+6;
-  const total=itemH*(items.length-1);
-  gsap.to(listWrapper,{
-    y:-total,ease:'none',
-    scrollTrigger:{
-      trigger:section,start:'top top',end:'+='+ total,
-      pin:true,scrub:0.8,
-      onUpdate:(self)=>{
-        const idx=Math.min(Math.max(0,Math.round(self.progress*(items.length-1))), items.length-1);
-        items.forEach((it,i)=>it.classList.toggle('active',i===idx));
-        if(preview && items[idx] && items[idx].dataset.img) preview.src=items[idx].dataset.img;
+/* ────────────────────────────────────
+   CHART 1: PROJECT STATUS — Doughnut
+──────────────────────────────────── */
+const projectCtx = $('#projectChart').getContext('2d');
+new Chart(projectCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Completed', 'Ongoing', 'Pending'],
+    datasets: [{
+      data: [129, 4, 9],
+      backgroundColor: [C.green, C.yellow, C.red],
+      borderColor: '#ffffff',
+      borderWidth: 3,
+      hoverOffset: 8,
+    }],
+  },
+  options: {
+    cutout: '68%',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ` ${ctx.label}: ${ctx.raw} projects`,
+        },
+        backgroundColor: '#111',
+        titleColor: '#fff',
+        bodyColor: '#d1d5db',
+        padding: 10,
+        cornerRadius: 8,
       },
-      onLeave:()=>{if(preview) gsap.to(preview,{opacity:0,duration:0.3});items.forEach(it=>it.classList.remove('active'));},
-      onEnterBack:()=>{if(preview) gsap.to(preview,{opacity:1,duration:0.3});},
+    },
+    animation: {
+      animateScale: true,
+      duration: 1000,
+    },
+  },
+});
+
+/* ────────────────────────────────────
+   CHART 2: FUNDING ROUNDS — Bar
+──────────────────────────────────── */
+const fundingCtx = $('#fundingChart').getContext('2d');
+new Chart(fundingCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Round 1', 'Round 2'],
+    datasets: [{
+      label: 'Amount (₹ Lakhs)',
+      data: [16, 19],
+      backgroundColor: [C.blue, C.green],
+      borderRadius: 8,
+      borderSkipped: false,
+      maxBarThickness: 60,
+    }],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false },
+      },
+      y: {
+        beginAtZero: true,
+        max: 25,
+        ticks: {
+          callback: (val) => `₹${val}L`,
+          stepSize: 5,
+        },
+        grid: { color: '#f3f4f6' },
+        border: { display: false },
+      },
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ` ₹${ctx.raw} Lakhs`,
+        },
+        backgroundColor: '#111',
+        titleColor: '#fff',
+        bodyColor: '#d1d5db',
+        padding: 10,
+        cornerRadius: 8,
+      },
+    },
+    animation: { duration: 1000 },
+  },
+});
+
+/* ────────────────────────────────────
+   CHART 3: INVESTMENT vs FUND USAGE — Line
+──────────────────────────────────── */
+const investCtx = $('#investChart').getContext('2d');
+new Chart(investCtx, {
+  type: 'line',
+  data: {
+    labels: ['Q1 FY24', 'Q2 FY24', 'Q3 FY24', 'Q4 FY24', 'Q1 FY25'],
+    datasets: [
+      {
+        label: 'Total Investment (₹L)',
+        data: [10, 20, 30, 38, 43],
+        borderColor: C.blue,
+        backgroundColor: 'rgba(37,99,235,.08)',
+        pointBackgroundColor: C.blue,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        tension: 0.4,
+        fill: true,
+        borderWidth: 2.5,
+      },
+      {
+        label: 'Fund Utilized (₹L)',
+        data: [12, 28, 45, 62, 78],
+        borderColor: C.red,
+        backgroundColor: 'rgba(232,64,64,.06)',
+        pointBackgroundColor: C.red,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        tension: 0.4,
+        fill: true,
+        borderWidth: 2.5,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: { callback: (val) => `₹${val}L` },
+        grid: { color: '#f3f4f6' },
+        border: { display: false },
+      },
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ` ${ctx.dataset.label}: ₹${ctx.raw}L`,
+        },
+        backgroundColor: '#111',
+        titleColor: '#fff',
+        bodyColor: '#d1d5db',
+        padding: 10,
+        cornerRadius: 8,
+      },
+    },
+    animation: { duration: 1200 },
+  },
+});
+
+/* ────────────────────────────────────
+   CHART 4: PATENT STATUS — Pie
+──────────────────────────────────── */
+const patentCtx = $('#patentChart').getContext('2d');
+new Chart(patentCtx, {
+  type: 'pie',
+  data: {
+    labels: ['Granted', 'Pending'],
+    datasets: [{
+      data: [3, 1],
+      backgroundColor: [C.green, C.yellow],
+      borderColor: '#ffffff',
+      borderWidth: 3,
+      hoverOffset: 6,
+    }],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ` ${ctx.label}: ${ctx.raw} patent${ctx.raw > 1 ? 's' : ''}`,
+        },
+        backgroundColor: '#111',
+        titleColor: '#fff',
+        bodyColor: '#d1d5db',
+        padding: 10,
+        cornerRadius: 8,
+      },
+    },
+    animation: { animateScale: true, duration: 1000 },
+  },
+});
+
+/* ────────────────────────────────────
+   SMOOTH SCROLL for anchor links
+──────────────────────────────────── */
+navLinks.forEach(link => {
+  link.addEventListener('click', function (e) {
+    const sectionId = this.dataset.section;
+    const target = document.getElementById(sectionId);
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   });
-})();
+});
 
-/* ── PIN CARDS (safe existence checks) ── */
-(function(){
-  const cards=gsap.utils.toArray('.pin-card');
-  if(cards.length){
-    cards.forEach((card,i)=>{
-      if(i<cards.length-1){
-        ScrollTrigger.create({
-          trigger:card,start:'top top',
-          endTrigger:cards[cards.length-1],end:'top top',
-          pin:true,pinSpacing:false
+/* ────────────────────────────────────
+   PROGRESS BARS — animate on scroll
+──────────────────────────────────── */
+const progressBars = $$('.proj-fill, .fund-fill');
+
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const bar = entry.target;
+      const target = bar.style.width;
+      bar.style.width = '0';
+      // Trigger reflow then animate
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          bar.style.transition = 'width 1.2s cubic-bezier(.4,0,.2,1)';
+          bar.style.width = target;
         });
-        ScrollTrigger.create({
-          trigger:cards[i+1],start:'top bottom',end:'top top',
-          onUpdate:(self)=>{
-            const p=self.progress;
-            gsap.set(card,{
-              scale:1-p*0.22,
-              rotation: i%2===0 ? p*4 : -p*4,
-              rotationX: i%2===0 ? p*35 : -p*35,
-            });
-            const overlay = card.querySelector('.pin-card-overlay');
-            if(overlay) gsap.set(overlay,{opacity:p*0.45});
-          }
-        });
-      }
-    });
+      });
+      barObserver.unobserve(bar);
+    }
+  });
+}, { threshold: 0.3 });
+
+progressBars.forEach(bar => barObserver.observe(bar));
+
+/* ────────────────────────────────────
+   TOOLTIP on KPI cards (hover)
+──────────────────────────────────── */
+// Simple title tooltip enhancement — already handled by browser via title attribute
+// We can add a subtle class toggle for the hover ring effect
+const kpiCards = $$('.kpi-card');
+kpiCards.forEach(card => {
+  card.addEventListener('mouseenter', () => {
+    card.style.borderLeftWidth = '4px';
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.borderLeftWidth = '3px';
+  });
+});
+
+/* ────────────────────────────────────
+   ECO CARDS — subtle entrance animation
+──────────────────────────────────── */
+const ecoCards = $$('.eco-card, .patent-card, .fund-card');
+const cardObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '0';
+      entry.target.style.transform = 'translateY(16px)';
+      setTimeout(() => {
+        entry.target.style.transition = 'opacity .4s ease, transform .4s ease';
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }, i * 60);
+      cardObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+
+ecoCards.forEach(card => cardObserver.observe(card));
+
+/* ────────────────────────────────────
+   INIT — mark first section active
+──────────────────────────────────── */
+(function init () {
+  // Set overview as active on load
+  const firstLink = navLinks.find(l => l.dataset.section === 'overview');
+  if (firstLink) {
+    navLinks.forEach(l => l.classList.remove('active'));
+    firstLink.classList.add('active');
   }
-})();
+  breadcrumbEl.textContent = 'Overview';
 
-/* ── FINAL REFRESH to avoid duplicate triggers and ensure proper layering ── */
-ScrollTrigger.refresh();
+  console.log(
+    '%c XBzin Admin Dashboard %c Loaded Successfully ',
+    'background:#2563eb;color:#fff;font-weight:700;padding:4px 8px;border-radius:4px 0 0 4px',
+    'background:#22c55e;color:#fff;font-weight:700;padding:4px 8px;border-radius:0 4px 4px 0'
+  );
+})();
