@@ -1,373 +1,637 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bharat Shukla — JavaScript Developer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Raleway:wght@200;300;400;500;600&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>XBzin Ecosystem — Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+  <!-- Google Fonts: Poppins + Space Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">BS</a>
-  <ul class="nav-links">
-    <li><a href="#about-intro">About</a></li>
-    <li><a href="#projects">Work</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#experience">Experience</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <div class="hamburger">
-    <svg width="16" height="8" viewBox="0 0 16 8" fill="none">
-      <path d="M0 1H16M4 7H16" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
-    </svg>
-  </div>
-</nav>
-
-<!-- ─── HERO ─── -->
-<section id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-eyebrow">JavaScript Developer &nbsp;|&nbsp; AI & Full-Stack &nbsp;|&nbsp; Founder</div>
-  <h1 class="hero-title">
-    <span class="line"><span>Bharat</span></span>
-    <span class="line"><span class="em">Shukla.</span></span>
-  </h1>
-  <div class="hero-bottom">
-    <p class="hero-desc">Building intelligent web experiences — from pixel-perfect frontends to AI-powered systems. 60+ projects shipped.</p>
-    <a class="hero-cta" href="#projects">View Works →</a>
-  </div>
-  <div class="hero-scroll-hint">
-    <div class="scroll-line"></div>
-    <span>Scroll</span>
-  </div>
-</section>
-
-<!-- ─── ABOUT INTRO ─── -->
-<section id="about-intro">
-  <span class="label">Amity University, Lucknow — BCA &nbsp;|&nbsp; CGPA 8.9</span>
-  <h2>Code meets<br/><em>Creativity</em></h2>
-</section>
-
-<!-- ─── WEBGL REVEAL ─── -->
-<div class="webgl-stage" id="webglStage">
-  <img id="sourceImg" loading="lazy"
-    src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=2000&q=85&auto=format&fit=crop"
-    crossorigin="anonymous" alt=""/>
-  <div class="progress-overlay" id="progressDisplay">0%</div>
-</div>
-
-<!-- ─── ABOUT END ─── -->
-<section id="about-end">
-  <span class="label">About Me</span>
-  <h2>JavaScript Developer<br/><em>& Innovator</em></h2>
-  <p>Crafting full-stack solutions and AI-powered tools since 2022. Patent holder, freelancer, and founder of the XBzin Ecosystem — building products that solve real-world problems with code.</p>
-  <div class="about-stats">
-    <div class="stat-item"><span class="stat-num">60+</span><span class="stat-label">Projects Shipped</span></div>
-    <div class="stat-item"><span class="stat-num">3</span><span class="stat-label">Patents Filed</span></div>
-    <div class="stat-item"><span class="stat-num">4+</span><span class="stat-label">Yrs Experience</span></div>
-  </div>
-</section>
-
-<!-- ─── PROJECTS ─── -->
-<section id="projects">
-  <div class="projects-header">
-    <div class="section-label">Selected Works — 2022–2025</div>
-    <h2>The<br/><em>Works.</em></h2>
-  </div>
-
-  <div class="scroll-section" id="projectsScrollSection">
-    <div class="scroll-container" id="projectsContainer">
-
-      <div class="card">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&q=80" alt="CropGuard"/>
-        <div class="card-overlay">
-          <h3>CropGuard — AI Yield Prediction</h3>
-          <div class="card-tags">
-            <span class="card-tag">Patent Filed</span>
-            <span class="card-tag">HTML/JS</span>
-            <span class="card-tag">Chart.js</span>
-          </div>
-        </div>
-        <div class="card-bottom">
-          <p>CropGuard</p>
-          <span>AI-based Crop Yield & Profit System</span>
-        </div>
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon"><i class="fa-solid fa-bolt"></i></span>
+        <span class="logo-text">XBzin</span>
       </div>
-
-      <div class="card">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80" alt="XBZIN Tools"/>
-        <div class="card-overlay">
-          <h3>XBZIN Tools — File Converter</h3>
-          <div class="card-tags">
-            <span class="card-tag">PDF.js</span>
-            <span class="card-tag">JSZip</span>
-            <span class="card-tag">jsPDF</span>
-          </div>
-        </div>
-        <div class="card-bottom">
-          <p>XBZIN Tools</p>
-          <span>All-in-One File Conversion Suite</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1559028012-481c04fa702d?w=800&q=80" alt="Mental Health Monitor"/>
-        <div class="card-overlay">
-          <h3>Mental Health Monitoring System</h3>
-          <div class="card-tags">
-            <span class="card-tag">Patent Filed</span>
-            <span class="card-tag">AI/ML</span>
-            <span class="card-tag">Node.js</span>
-          </div>
-        </div>
-        <div class="card-bottom">
-          <p>MindTrack</p>
-          <span>Emotional Parameter Health Monitor</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80" alt="Ayurvedic AI"/>
-        <div class="card-overlay">
-          <h3>AI Ayurvedic Recommender</h3>
-          <div class="card-tags">
-            <span class="card-tag">Patent Filed</span>
-            <span class="card-tag">AI</span>
-            <span class="card-tag">JavaScript</span>
-          </div>
-        </div>
-        <div class="card-bottom">
-          <p>AyurAI</p>
-          <span>Personalized Ayurvedic Medicine AI</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80" alt="E-commerce"/>
-        <div class="card-overlay">
-          <h3>Custom E-Commerce Platforms</h3>
-          <div class="card-tags">
-            <span class="card-tag">HTML/CSS</span>
-            <span class="card-tag">JS</span>
-            <span class="card-tag">Node.js</span>
-          </div>
-        </div>
-        <div class="card-bottom">
-          <p>XBzin Ecosystem</p>
-          <span>Full-Stack Commerce Solutions</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80" alt="Dashboard"/>
-        <div class="card-overlay">
-          <h3>Business Analytics Dashboard</h3>
-          <div class="card-tags">
-            <span class="card-tag">Tailwind</span>
-            <span class="card-tag">Chart.js</span>
-            <span class="card-tag">SQL</span>
-          </div>
-        </div>
-        <div class="card-bottom">
-          <p>DataView Pro</p>
-          <span>Real-time Business Intelligence UI</span>
-        </div>
-      </div>
-
+      <button class="sidebar-close" id="sidebarClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
-  </div>
 
-  <div class="progress-bar-wrap">
-    EXPLORE &nbsp;<span id="projProgress">(00%)</span>
-  </div>
-</section>
-
-<!-- ─── SKILLS ─── -->
-<section id="skills">
-  <div class="skills-intro">
-    <div class="section-label">Technical Expertise</div>
-    <h2>The <em>Stack.</em></h2>
-    <p>Full-spectrum developer — from beautiful UIs to intelligent backends. Here's what I bring to the table.</p>
-  </div>
-
-  <img class="preview-image" id="skillPreview" loading="lazy"
-    src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80" alt=""/>
-
-  <div class="skills-list-section" id="skillsSection">
-    <div class="skills-list-wrapper" id="skillsListWrapper">
-      <div class="skills-list" id="skillsList">
-        <div class="skill-item" data-img="https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=800&q=80">
-          <span class="skill-index">01</span>
-          <span class="skill-name">JavaScript</span>
-          <span class="skill-level">Expert</span>
-        </div>
-        <div class="skill-item" data-img="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80">
-          <span class="skill-index">02</span>
-          <span class="skill-name">Python</span>
-          <span class="skill-level">Advanced</span>
-        </div>
-        <div class="skill-item" data-img="https://images.unsplash.com/photo-1487014679447-9f8336841d58?w=800&q=80">
-          <span class="skill-index">03</span>
-          <span class="skill-name">HTML & CSS</span>
-          <span class="skill-level">Expert</span>
-        </div>
-        <div class="skill-item" data-img="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80">
-          <span class="skill-index">04</span>
-          <span class="skill-name">Node.js</span>
-          <span class="skill-level">Advanced</span>
-        </div>
-        <div class="skill-item" data-img="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&q=80">
-          <span class="skill-index">05</span>
-          <span class="skill-name">SQL / Database</span>
-          <span class="skill-level">Proficient</span>
-        </div>
-        <div class="skill-item" data-img="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80">
-          <span class="skill-index">06</span>
-          <span class="skill-name">AI & APIs</span>
-          <span class="skill-level">Advanced</span>
-        </div>
-        <div class="skill-item" data-img="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80">
-          <span class="skill-index">07</span>
-          <span class="skill-name">Tailwind CSS</span>
-          <span class="skill-level">Expert</span>
-        </div>
-        <div class="skill-item" data-img="https://images.unsplash.com/photo-1551033406-611cf9a28f67?w=800&q=80">
-          <span class="skill-index">08</span>
-          <span class="skill-name">DSA — Java</span>
-          <span class="skill-level">Proficient</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── EXPERIENCE PIN CARDS ─── -->
-<section id="experience">
-  <div class="exp-intro">
-    <div class="section-label">Journey & Experience</div>
-    <h2>Building<br/><em>Since 2022.</em></h2>
-    <p>From freelancing my first project to filing patents — a journey of relentless building and shipping.</p>
-  </div>
-
-  <div class="pin-card" id="pc1">
-    <div class="pin-card-overlay"></div>
-    <div class="pin-card-num">(01)</div>
-    <div class="pin-card-content">
-      <span class="exp-role">Freelance Web Developer &nbsp;·&nbsp; 2022 – Present</span>
-      <h3>Full-Stack Web Development</h3>
-      <p>Successfully delivered 60+ client projects spanning custom websites, e-commerce platforms, and business landing pages. Every project built with precision and performance in mind.</p>
-      <div class="exp-tags">
-        <span class="exp-tag">HTML/CSS</span>
-        <span class="exp-tag">JavaScript</span>
-        <span class="exp-tag">Node.js</span>
-        <span class="exp-tag">Tailwind</span>
-        <span class="exp-tag">60+ Projects</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pin-card" id="pc2">
-    <div class="pin-card-overlay"></div>
-    <div class="pin-card-num">(02)</div>
-    <div class="pin-card-content">
-      <span class="exp-role">Founder & Developer &nbsp;·&nbsp; XBzin Ecosystem &nbsp;·&nbsp; 2024 – Present</span>
-      <h3>XBzin Ecosystem</h3>
-      <p>Founded and built XBzin — a suite of developer tools and productivity applications. Led product design, development, and go-to-market strategy from day one.</p>
-      <div class="exp-tags">
-        <span class="exp-tag">Product</span>
-        <span class="exp-tag">Full-Stack</span>
-        <span class="exp-tag">Founder</span>
-        <span class="exp-tag">AI Tools</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pin-card" id="pc3">
-    <div class="pin-card-overlay"></div>
-    <div class="pin-card-num">(03)</div>
-    <div class="pin-card-content">
-      <span class="exp-role">Patent Holder &nbsp;·&nbsp; 2025</span>
-      <h3>3 Patents Filed</h3>
-      <p>Inventor of CropGuard (AI Yield Prediction), Mental Health Monitoring with Emotional Parameters, and AI-Powered Ayurvedic Medicine Recommender — all filed in 2025 with the Indian Patent Office.</p>
-      <div class="exp-tags">
-        <span class="exp-tag">Patent No. 202511052680</span>
-        <span class="exp-tag">Patent No. 202511046941</span>
-        <span class="exp-tag">Patent No. 20251104366</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="pin-card" id="pc4">
-    <div class="pin-card-overlay"></div>
-    <div class="pin-card-num">(04)</div>
-    <div class="pin-card-content">
-      <span class="exp-role">Student &nbsp;·&nbsp; Amity University Lucknow &nbsp;·&nbsp; 2023 – 2026</span>
-      <h3>BCA — Computer Applications</h3>
-      <p>Pursuing Bachelor of Computer Application with a CGPA of 8.9. Actively applying academic knowledge to real-world projects alongside coursework in DSA, backend systems, and AI.</p>
-      <div class="exp-tags">
-        <span class="exp-tag">CGPA 8.9</span>
-        <span class="exp-tag">Lucknow, India</span>
-        <span class="exp-tag">2023–2026</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="exp-outro" id="expOutro">
-    <span class="section-label">What's Next</span>
-    <h2>Let's Build<br/><em>Something.</em></h2>
-  </div>
-</section>
-
-<!-- ─── CONTACT ─── -->
-<section id="contact">
-  <div class="contact-inner">
-    <div class="contact-left">
-      <div class="section-label">Get In Touch</div>
-      <h2>Say<br/><em>Hello.</em></h2>
-      <p>Open to collaborations, freelance projects, and exciting full-time opportunities. Let's build something remarkable together.</p>
-    </div>
-    <div class="contact-right">
-      <a class="contact-link" href="mailto:itsmebhsh@gmail.com">
-        <div>
-          <span class="contact-link-label">Email</span>
-          <span class="contact-link-val">itsmebhsh@gmail.com</span>
-        </div>
-        <span class="contact-link-arrow">↗</span>
+    <div class="sidebar-section-label">Main</div>
+    <nav class="sidebar-nav">
+      <a href="#overview" class="nav-item active" data-section="overview">
+        <i class="fa-solid fa-gauge-high"></i>
+        <span>Overview</span>
       </a>
-      <a class="contact-link" href="https://github.com" target="_blank" rel="noopener noreferrer">
-        <div>
-          <span class="contact-link-label">GitHub</span>
-          <span class="contact-link-val">github.com/bharat</span>
-        </div>
-        <span class="contact-link-arrow">↗</span>
+      <a href="#projects" class="nav-item" data-section="projects">
+        <i class="fa-solid fa-diagram-project"></i>
+        <span>Projects</span>
       </a>
-      <a class="contact-link" href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-        <div>
-          <span class="contact-link-label">LinkedIn</span>
-          <span class="contact-link-val">linkedin.com/in/bharat</span>
-        </div>
-        <span class="contact-link-arrow">↗</span>
+      <a href="#funding" class="nav-item" data-section="funding">
+        <i class="fa-solid fa-indian-rupee-sign"></i>
+        <span>Funding</span>
       </a>
+      <a href="#patents" class="nav-item" data-section="patents">
+        <i class="fa-solid fa-certificate"></i>
+        <span>Patents</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-section-label">Ecosystem</div>
+    <nav class="sidebar-nav">
+      <a href="#ecosystem" class="nav-item" data-section="ecosystem">
+        <i class="fa-solid fa-brain"></i>
+        <span>AI Hub</span>
+      </a>
+      <a href="#ecosystem" class="nav-item" data-section="ecosystem">
+        <i class="fa-solid fa-globe"></i>
+        <span>Web Services</span>
+      </a>
+      <a href="#ecosystem" class="nav-item" data-section="ecosystem">
+        <i class="fa-solid fa-wrench"></i>
+        <span>Tools</span>
+      </a>
+      <a href="#ecosystem" class="nav-item" data-section="ecosystem">
+        <i class="fa-solid fa-users"></i>
+        <span>Community</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-section-label">System</div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-gear"></i>
+        <span>Settings</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Security</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-profile">
+        <div class="profile-avatar small">BS</div>
+        <div>
+          <div class="profile-name-small">Bharat Shukla</div>
+          <div class="profile-role">Founder & CEO</div>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+  </aside>
 
-<footer>
-  <p>© 2025 Bharat Shukla — JavaScript Developer & AI Builder</p>
-  <p class="footer-patents">Patent Holder · CropGuard · MindTrack · AyurAI · Built with Passion in India</p>
-</footer>
+  <!-- ========== OVERLAY ========== -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- SCRIPTS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://unpkg.com/lenis@1.0.42/dist/lenis.min.js"></script>
+  <!-- ========== MAIN WRAPPER ========== -->
+  <div class="main-wrapper" id="mainWrapper">
 
-<script src="script.js"></script>
+    <!-- ===== TOP NAVBAR ===== -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger"><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-title">
+          <span class="page-label">Admin Dashboard</span>
+          <span class="breadcrumb"><i class="fa-solid fa-chevron-right"></i> Overview</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-bar">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search..." />
+        </div>
+        <button class="icon-btn notif-btn" id="notifBtn">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge">3</span>
+        </button>
+        <div class="topbar-profile">
+          <div class="profile-avatar">BS</div>
+          <div class="profile-info">
+            <span class="profile-name">Bharat Shukla</span>
+            <span class="profile-tag">CEO</span>
+          </div>
+          <i class="fa-solid fa-chevron-down profile-arrow"></i>
+        </div>
+      </div>
+    </header>
 
+    <!-- ===== NOTIFICATION PANEL ===== -->
+    <div class="notif-panel" id="notifPanel">
+      <div class="notif-panel-header">
+        <span>Notifications</span>
+        <button class="mark-all">Mark all read</button>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-icon green"><i class="fa-solid fa-check"></i></div>
+        <div><strong>Patent #4 Approved</strong><br/><small>2 hours ago</small></div>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-icon yellow"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div><strong>Round 2 Funding Closed</strong><br/><small>Yesterday</small></div>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-icon blue"><i class="fa-solid fa-rocket"></i></div>
+        <div><strong>New Project Milestone</strong><br/><small>2 days ago</small></div>
+      </div>
+    </div>
 
+    <!-- ===== PAGE CONTENT ===== -->
+    <main class="content" id="content">
+
+      <!-- ── SECTION: OVERVIEW ── -->
+      <section id="overview" class="dashboard-section">
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+          <div class="welcome-text">
+            <h2>Welcome back, Bharat 👋</h2>
+            <p>Here's what's happening across the XBzin Ecosystem today.</p>
+          </div>
+          <div class="welcome-meta">
+            <span class="date-chip"><i class="fa-regular fa-calendar"></i> <span id="currentDate"></span></span>
+            <span class="status-chip"><i class="fa-solid fa-circle-check"></i> All Systems Operational</span>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card" data-color="blue">
+            <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Total Employees</span>
+              <span class="kpi-value" data-target="16">0</span>
+              <span class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +2 this quarter</span>
+            </div>
+          </div>
+          <div class="kpi-card" data-color="green">
+            <div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Projects Completed</span>
+              <span class="kpi-value" data-target="129">0</span>
+              <span class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +12 this year</span>
+            </div>
+          </div>
+          <div class="kpi-card" data-color="yellow">
+            <div class="kpi-icon"><i class="fa-solid fa-spinner"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Ongoing Projects</span>
+              <span class="kpi-value" data-target="4">0</span>
+              <span class="kpi-trend neutral"><i class="fa-solid fa-minus"></i> In progress</span>
+            </div>
+          </div>
+          <div class="kpi-card" data-color="red">
+            <div class="kpi-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Pending Projects</span>
+              <span class="kpi-value" data-target="9">0</span>
+              <span class="kpi-trend down"><i class="fa-solid fa-arrow-trend-down"></i> Needs attention</span>
+            </div>
+          </div>
+          <div class="kpi-card" data-color="black">
+            <div class="kpi-icon"><i class="fa-solid fa-building"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Company Valuation</span>
+              <span class="kpi-value">₹1Cr</span>
+              <span class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> Growing</span>
+            </div>
+          </div>
+          <div class="kpi-card" data-color="blue">
+            <div class="kpi-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Total Investment</span>
+              <span class="kpi-value">₹43L</span>
+              <span class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> 2 rounds</span>
+            </div>
+          </div>
+          <div class="kpi-card" data-color="green">
+            <div class="kpi-icon"><i class="fa-solid fa-chart-pie"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Fund Utilized</span>
+              <span class="kpi-value">₹78L</span>
+              <span class="kpi-trend neutral"><i class="fa-solid fa-minus"></i> 81% deployed</span>
+            </div>
+          </div>
+          <div class="kpi-card" data-color="yellow">
+            <div class="kpi-icon"><i class="fa-solid fa-certificate"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Total Patents</span>
+              <span class="kpi-value" data-target="4">0</span>
+              <span class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> 3 filed</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="charts-row">
+          <div class="chart-card wide">
+            <div class="chart-card-header">
+              <div>
+                <h3>Project Status</h3>
+                <p class="chart-sub">Breakdown of all 142 project entries</p>
+              </div>
+              <span class="chart-badge">Doughnut</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="projectChart"></canvas>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-dot green"></span> Completed: 129
+              <span class="legend-dot yellow"></span> Ongoing: 4
+              <span class="legend-dot red"></span> Pending: 9
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3>Patent Status</h3>
+                <p class="chart-sub">4 total patents filed</p>
+              </div>
+              <span class="chart-badge">Pie</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="patentChart"></canvas>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-dot blue"></span> Completed: 3
+              <span class="legend-dot red"></span> Pending: 1
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3>Funding Rounds</h3>
+                <p class="chart-sub">Round 1 & Round 2 comparison</p>
+              </div>
+              <span class="chart-badge">Bar</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="fundingChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card wide">
+            <div class="chart-card-header">
+              <div>
+                <h3>Investment vs Fund Utilized</h3>
+                <p class="chart-sub">Financial overview across quarters</p>
+              </div>
+              <span class="chart-badge">Line</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="investmentChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── SECTION: PROJECTS ── -->
+      <section id="projects" class="dashboard-section">
+        <div class="section-header">
+          <h2>Project Analytics</h2>
+          <p>Detailed overview of all XBzin projects</p>
+        </div>
+
+        <div class="project-summary-row">
+          <div class="project-stat-card completed">
+            <i class="fa-solid fa-circle-check"></i>
+            <div>
+              <span class="pstat-num">129</span>
+              <span class="pstat-label">Completed</span>
+            </div>
+            <div class="pstat-bar"><div class="pstat-fill" style="width:90%"></div></div>
+          </div>
+          <div class="project-stat-card ongoing">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <div>
+              <span class="pstat-num">4</span>
+              <span class="pstat-label">Ongoing</span>
+            </div>
+            <div class="pstat-bar"><div class="pstat-fill" style="width:20%"></div></div>
+          </div>
+          <div class="project-stat-card pending">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <div>
+              <span class="pstat-num">9</span>
+              <span class="pstat-label">Pending</span>
+            </div>
+            <div class="pstat-bar"><div class="pstat-fill" style="width:45%"></div></div>
+          </div>
+        </div>
+
+        <!-- Project Table -->
+        <div class="table-card">
+          <div class="table-header-row">
+            <h3>Recent Projects</h3>
+            <button class="btn-outline">View All <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Project Name</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Progress</th>
+                  <th>Team</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>001</td>
+                  <td><strong>XBzin AI Core Engine</strong></td>
+                  <td><span class="tag blue">AI Hub</span></td>
+                  <td><span class="status-badge completed">Completed</span></td>
+                  <td><div class="progress-bar"><div class="progress-fill green" style="width:100%"></div></div></td>
+                  <td>5 members</td>
+                </tr>
+                <tr>
+                  <td>002</td>
+                  <td><strong>XBzin Web Portal v3</strong></td>
+                  <td><span class="tag green">Web Services</span></td>
+                  <td><span class="status-badge ongoing">Ongoing</span></td>
+                  <td><div class="progress-bar"><div class="progress-fill yellow" style="width:65%"></div></div></td>
+                  <td>4 members</td>
+                </tr>
+                <tr>
+                  <td>003</td>
+                  <td><strong>Community Platform</strong></td>
+                  <td><span class="tag yellow">Community</span></td>
+                  <td><span class="status-badge ongoing">Ongoing</span></td>
+                  <td><div class="progress-bar"><div class="progress-fill yellow" style="width:45%"></div></div></td>
+                  <td>3 members</td>
+                </tr>
+                <tr>
+                  <td>004</td>
+                  <td><strong>Dev Tools Suite</strong></td>
+                  <td><span class="tag red">Tools</span></td>
+                  <td><span class="status-badge pending">Pending</span></td>
+                  <td><div class="progress-bar"><div class="progress-fill red" style="width:10%"></div></div></td>
+                  <td>2 members</td>
+                </tr>
+                <tr>
+                  <td>005</td>
+                  <td><strong>Analytics Dashboard</strong></td>
+                  <td><span class="tag blue">AI Hub</span></td>
+                  <td><span class="status-badge completed">Completed</span></td>
+                  <td><div class="progress-bar"><div class="progress-fill green" style="width:100%"></div></div></td>
+                  <td>4 members</td>
+                </tr>
+                <tr>
+                  <td>006</td>
+                  <td><strong>API Gateway System</strong></td>
+                  <td><span class="tag green">Web Services</span></td>
+                  <td><span class="status-badge pending">Pending</span></td>
+                  <td><div class="progress-bar"><div class="progress-fill red" style="width:25%"></div></div></td>
+                  <td>3 members</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION: FUNDING ── -->
+      <section id="funding" class="dashboard-section">
+        <div class="section-header">
+          <h2>Funding & Investment</h2>
+          <p>Complete financial overview of XBzin Ecosystem</p>
+        </div>
+
+        <div class="funding-grid">
+          <div class="funding-card total-investment">
+            <div class="funding-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+            <div class="funding-info">
+              <span class="funding-label">Total Investment Raised</span>
+              <span class="funding-amount">₹43 Lakhs</span>
+              <span class="funding-note">Across 2 funding rounds</span>
+            </div>
+          </div>
+          <div class="funding-card fund-used">
+            <div class="funding-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+            <div class="funding-info">
+              <span class="funding-label">Economic Fund Utilized</span>
+              <span class="funding-amount">₹78 Lakhs</span>
+              <span class="funding-note">Total operational spend</span>
+            </div>
+          </div>
+          <div class="funding-card valuation">
+            <div class="funding-icon"><i class="fa-solid fa-building-columns"></i></div>
+            <div class="funding-info">
+              <span class="funding-label">Company Valuation</span>
+              <span class="funding-amount">₹1 Crore</span>
+              <span class="funding-note">Current market estimate</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Funding Round Details -->
+        <div class="round-cards">
+          <div class="round-card">
+            <div class="round-header">
+              <span class="round-tag">Round 1</span>
+              <i class="fa-solid fa-circle-check green-icon"></i>
+            </div>
+            <div class="round-amount">₹16 Lakhs</div>
+            <div class="round-bar"><div class="round-fill" style="width:84%"></div></div>
+            <div class="round-meta">
+              <span>Seed Funding</span>
+              <span class="green-text">Closed ✓</span>
+            </div>
+          </div>
+          <div class="round-card">
+            <div class="round-header">
+              <span class="round-tag">Round 2</span>
+              <i class="fa-solid fa-circle-check green-icon"></i>
+            </div>
+            <div class="round-amount">₹19 Lakhs</div>
+            <div class="round-bar"><div class="round-fill" style="width:100%"></div></div>
+            <div class="round-meta">
+              <span>Series A</span>
+              <span class="green-text">Closed ✓</span>
+            </div>
+          </div>
+          <div class="round-card inactive">
+            <div class="round-header">
+              <span class="round-tag pending-tag">Round 3</span>
+              <i class="fa-solid fa-clock yellow-icon"></i>
+            </div>
+            <div class="round-amount">TBD</div>
+            <div class="round-bar"><div class="round-fill inactive-fill" style="width:0%"></div></div>
+            <div class="round-meta">
+              <span>Series B</span>
+              <span class="yellow-text">Planning Phase</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION: PATENTS ── -->
+      <section id="patents" class="dashboard-section">
+        <div class="section-header">
+          <h2>Patent Tracker</h2>
+          <p>Intellectual property management for XBzin</p>
+        </div>
+
+        <div class="patent-overview">
+          <div class="patent-kpi blue-bg">
+            <i class="fa-solid fa-certificate"></i>
+            <span class="pk-num">4</span>
+            <span class="pk-label">Total Patents</span>
+          </div>
+          <div class="patent-kpi green-bg">
+            <i class="fa-solid fa-check-double"></i>
+            <span class="pk-num">3</span>
+            <span class="pk-label">Completed</span>
+          </div>
+          <div class="patent-kpi red-bg">
+            <i class="fa-solid fa-hourglass"></i>
+            <span class="pk-num">1</span>
+            <span class="pk-label">Pending</span>
+          </div>
+        </div>
+
+        <div class="patent-list">
+          <div class="patent-item">
+            <div class="patent-number">#P001</div>
+            <div class="patent-details">
+              <strong>AI-Powered Data Processing Algorithm</strong>
+              <span>XBzin AI Hub — Filed 2022</span>
+            </div>
+            <span class="status-badge completed">Granted</span>
+          </div>
+          <div class="patent-item">
+            <div class="patent-number">#P002</div>
+            <div class="patent-details">
+              <strong>Distributed Web Service Architecture</strong>
+              <span>XBzin Web Services — Filed 2023</span>
+            </div>
+            <span class="status-badge completed">Granted</span>
+          </div>
+          <div class="patent-item">
+            <div class="patent-number">#P003</div>
+            <div class="patent-details">
+              <strong>Intelligent Developer Tool Interface</strong>
+              <span>XBzin Tools — Filed 2023</span>
+            </div>
+            <span class="status-badge completed">Granted</span>
+          </div>
+          <div class="patent-item">
+            <div class="patent-number">#P004</div>
+            <div class="patent-details">
+              <strong>Community-Driven Knowledge Graph</strong>
+              <span>XBzin Community — Filed 2024</span>
+            </div>
+            <span class="status-badge pending">Pending</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION: ECOSYSTEM ── -->
+      <section id="ecosystem" class="dashboard-section">
+        <div class="section-header">
+          <h2>XBzin Ecosystem Modules</h2>
+          <p>Core pillars of the XBzin platform</p>
+        </div>
+
+        <div class="ecosystem-grid">
+          <div class="eco-card" data-module="ai">
+            <div class="eco-icon blue-bg"><i class="fa-solid fa-brain"></i></div>
+            <div class="eco-content">
+              <h3>XBzin AI Hub</h3>
+              <p>Powering intelligent automation, machine learning pipelines, and AI-driven insights across the entire ecosystem.</p>
+              <div class="eco-stats">
+                <span><i class="fa-solid fa-microchip"></i> 12 AI Models</span>
+                <span><i class="fa-solid fa-bolt"></i> 99.9% Uptime</span>
+              </div>
+              <div class="eco-footer">
+                <span class="eco-status active">Active</span>
+                <button class="btn-sm">Explore <i class="fa-solid fa-arrow-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="eco-card" data-module="web">
+            <div class="eco-icon green-bg"><i class="fa-solid fa-globe"></i></div>
+            <div class="eco-content">
+              <h3>XBzin Web Services</h3>
+              <p>Scalable cloud infrastructure, API management, and web hosting solutions for modern applications.</p>
+              <div class="eco-stats">
+                <span><i class="fa-solid fa-server"></i> 8 Services</span>
+                <span><i class="fa-solid fa-shield"></i> SSL Secured</span>
+              </div>
+              <div class="eco-footer">
+                <span class="eco-status active">Active</span>
+                <button class="btn-sm">Explore <i class="fa-solid fa-arrow-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="eco-card" data-module="tools">
+            <div class="eco-icon yellow-bg"><i class="fa-solid fa-wrench"></i></div>
+            <div class="eco-content">
+              <h3>XBzin Tools</h3>
+              <p>Developer productivity suite with code editors, debuggers, deployment pipelines, and collaboration tools.</p>
+              <div class="eco-stats">
+                <span><i class="fa-solid fa-toolbox"></i> 24 Tools</span>
+                <span><i class="fa-solid fa-code"></i> Open APIs</span>
+              </div>
+              <div class="eco-footer">
+                <span class="eco-status beta">Beta</span>
+                <button class="btn-sm">Explore <i class="fa-solid fa-arrow-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="eco-card" data-module="community">
+            <div class="eco-icon red-bg"><i class="fa-solid fa-users"></i></div>
+            <div class="eco-content">
+              <h3>XBzin Community</h3>
+              <p>Vibrant developer community with forums, knowledge sharing, events, and collaborative project spaces.</p>
+              <div class="eco-stats">
+                <span><i class="fa-solid fa-user-group"></i> 340+ Members</span>
+                <span><i class="fa-solid fa-comments"></i> Active Forums</span>
+              </div>
+              <div class="eco-footer">
+                <span class="eco-status active">Active</span>
+                <button class="btn-sm">Explore <i class="fa-solid fa-arrow-right"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── FOOTER ── -->
+      <footer class="dashboard-footer">
+        <div class="footer-left">
+          <span class="footer-logo"><i class="fa-solid fa-bolt"></i> XBzin</span>
+          <span class="footer-tagline">Powering Tomorrow's Tech, Today.</span>
+        </div>
+        <div class="footer-right">
+          <span>Founder: Bharat Shukla</span>
+          <span class="footer-dot">•</span>
+          <span>© 2024 XBzin Ecosystem</span>
+          <span class="footer-dot">•</span>
+          <span>v2.4.1</span>
+        </div>
+      </footer>
+
+    </main>
+  </div><!-- end main-wrapper -->
+
+  <script src="script.js"></script>
 </body>
 </html>
