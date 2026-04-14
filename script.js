@@ -1,1244 +1,1032 @@
-/* ═══════════════════════════════════════════════════════════════
-   XBzin Ecosystem — Admin Dashboard v2.0
-   script.js | Full functionality | Pure JS + Chart.js
-   ═══════════════════════════════════════════════════════════════ */
+/*
+ * XBzin Admin Dashboard v2 — script.js
+ * Full-featured: Charts, Tables, Modals, Toast, Theme, CommandPalette,
+ * Notifications, Activity, Team, Settings, Export, Sorting, Filtering, Pagination
+ */
+
 'use strict';
 
-/* ════════════════════════════════════
-   DATA STORE
-════════════════════════════════════ */
+/* ────────────────────────────────────
+   DATA
+──────────────────────────────────── */
 const DATA = {
   projects: [
-    {id:'001',name:'AI Model Deployment v2',   module:'AI Hub',       status:'Ongoing',   priority:'High',  progress:72},
-    {id:'002',name:'Web Portal Revamp',         module:'Web Services', status:'Ongoing',   priority:'High',  progress:55},
-    {id:'003',name:'Toolkit API Integration',   module:'Tools',        status:'Ongoing',   priority:'Med',   progress:40},
-    {id:'004',name:'Community Forum Launch',    module:'Community',    status:'Ongoing',   priority:'Med',   progress:30},
-    {id:'005',name:'Patent Filing #4 Support',  module:'AI Hub',       status:'Pending',   priority:'High',  progress:10},
-    {id:'006',name:'Analytics Module v3',       module:'Web Services', status:'Pending',   priority:'Med',   progress:5},
-    {id:'007',name:'Security Audit FY25',       module:'Tools',        status:'Pending',   priority:'High',  progress:0},
-    {id:'008',name:'Mobile App Beta',           module:'Community',    status:'Pending',   priority:'Low',   progress:0},
-    {id:'009',name:'Investor Dashboard',        module:'Web Services', status:'Pending',   priority:'Med',   progress:0},
-    {id:'010',name:'AI Chatbot Integration',    module:'AI Hub',       status:'Pending',   priority:'High',  progress:0},
-    {id:'011',name:'E-commerce Plugin',         module:'Tools',        status:'Pending',   priority:'Low',   progress:0},
-    {id:'012',name:'Newsletter System',         module:'Community',    status:'Pending',   priority:'Low',   progress:0},
-    {id:'013',name:'Cloud Migration Phase 2',   module:'Web Services', status:'Pending',   priority:'High',  progress:0},
-  ],
-
-  patents: [
-    {id:'PAT-001',title:'AI Inference Engine',       module:'AI Hub',       status:'granted', date:'Jan 2023', desc:'Core AI processing pipeline patent for XBzin AI Hub neural inference architecture and model serving layer.'},
-    {id:'PAT-002',title:'Adaptive Web Routing',      module:'Web Services', status:'granted', date:'Jun 2023', desc:'Intelligent request-routing system with adaptive load balancing for XBzin Web Services distributed infrastructure.'},
-    {id:'PAT-003',title:'Modular Toolkit Framework', module:'Tools',        status:'granted', date:'Nov 2023', desc:'Plugin-based extensible toolkit architecture enabling third-party integrations across XBzin Tools ecosystem.'},
-    {id:'PAT-004',title:'Community AI Recommender',  module:'Community',    status:'pending', date:'Mar 2025', desc:'AI-driven personalized community engagement recommendation engine with real-time behavior analysis.'},
+    { id: 'P-001', name: 'AI Model Deployment v2', module: 'XBzin AI Hub', status: 'ongoing', priority: 'high', progress: 72, lead: 'BS' },
+    { id: 'P-002', name: 'Web Portal Revamp', module: 'XBzin Web Services', status: 'ongoing', priority: 'high', progress: 58, lead: 'RK' },
+    { id: 'P-003', name: 'Toolkit API Integration', module: 'XBzin Tools', status: 'ongoing', priority: 'medium', progress: 44, lead: 'PK' },
+    { id: 'P-004', name: 'Community Forum Launch', module: 'XBzin Community', status: 'ongoing', priority: 'medium', progress: 31, lead: 'AV' },
+    { id: 'P-005', name: 'Patent Filing #4 Support', module: 'XBzin AI Hub', status: 'pending', priority: 'high', progress: 10, lead: 'BS' },
+    { id: 'P-006', name: 'Analytics Module v3', module: 'XBzin Web Services', status: 'pending', priority: 'medium', progress: 5, lead: 'RK' },
+    { id: 'P-007', name: 'Security Audit FY25', module: 'XBzin Tools', status: 'pending', priority: 'high', progress: 0, lead: 'MN' },
+    { id: 'P-008', name: 'Mobile App Beta', module: 'XBzin Community', status: 'pending', priority: 'low', progress: 0, lead: 'AV' },
+    { id: 'P-009', name: 'Investor Dashboard', module: 'XBzin Web Services', status: 'pending', priority: 'medium', progress: 0, lead: 'RK' },
+    { id: 'P-010', name: 'NLP Engine Upgrade', module: 'XBzin AI Hub', status: 'pending', priority: 'high', progress: 0, lead: 'BS' },
+    { id: 'P-011', name: 'DevOps Pipeline', module: 'XBzin Tools', status: 'pending', priority: 'medium', progress: 0, lead: 'PK' },
+    { id: 'P-012', name: 'Chatbot Integration', module: 'XBzin Community', status: 'pending', priority: 'low', progress: 0, lead: 'AV' },
+    { id: 'P-013', name: 'Core ML Pipeline v1', module: 'XBzin AI Hub', status: 'completed', priority: 'high', progress: 100, lead: 'BS' },
   ],
 
   team: [
-    {name:'Bharat Shukla', role:'Founder & CEO',         dept:'Leadership',    proj:12, color:'#2563eb'},
-    {name:'Aryan Mehta',   role:'CTO',                   dept:'Engineering',   proj:8,  color:'#16a34a'},
-    {name:'Priya Singh',   role:'Lead AI Engineer',      dept:'AI Hub',        proj:6,  color:'#d97706'},
-    {name:'Rohan Gupta',   role:'Backend Developer',     dept:'Web Services',  proj:5,  color:'#dc2626'},
-    {name:'Neha Sharma',   role:'Frontend Developer',    dept:'Web Services',  proj:4,  color:'#7c3aed'},
-    {name:'Amit Patel',    role:'ML Researcher',         dept:'AI Hub',        proj:7,  color:'#0891b2'},
-    {name:'Kavya Rao',     role:'Product Manager',       dept:'Leadership',    proj:9,  color:'#be185d'},
-    {name:'Dev Verma',     role:'DevOps Engineer',       dept:'Tools',         proj:4,  color:'#059669'},
-    {name:'Sneha Jain',    role:'UX Designer',           dept:'Community',     proj:3,  color:'#ea580c'},
-    {name:'Raj Sinha',     role:'Data Scientist',        dept:'AI Hub',        proj:5,  color:'#6d28d9'},
-    {name:'Ananya Nair',   role:'Marketing Lead',        dept:'Community',     proj:3,  color:'#0284c7'},
-    {name:'Vikram Das',    role:'Security Analyst',      dept:'Tools',         proj:2,  color:'#b45309'},
-    {name:'Pooja Yadav',   role:'Community Manager',     dept:'Community',     proj:4,  color:'#0d9488'},
-    {name:'Karan Bose',    role:'Full Stack Developer',  dept:'Web Services',  proj:6,  color:'#4338ca'},
-    {name:'Meera Chawla',  role:'Legal & IP Counsel',    dept:'Leadership',    proj:4,  color:'#c026d3'},
-    {name:'Suresh Kumar',  role:'QA Engineer',           dept:'Tools',         proj:3,  color:'#65a30d'},
+    { name: 'Bharat Shukla', role: 'Founder & CEO', module: 'Leadership', initials: 'BS', color: '#2563eb' },
+    { name: 'Raj Kumar', role: 'CTO', module: 'XBzin AI Hub', initials: 'RK', color: '#16a34a' },
+    { name: 'Priya Kapoor', role: 'Lead Engineer', module: 'XBzin Tools', initials: 'PK', color: '#d97706' },
+    { name: 'Anita Verma', role: 'Product Manager', module: 'XBzin Community', initials: 'AV', color: '#dc2626' },
+    { name: 'Manish Nair', role: 'Security Lead', module: 'XBzin Tools', initials: 'MN', color: '#7c3aed' },
+    { name: 'Suman Das', role: 'Backend Dev', module: 'XBzin Web Services', initials: 'SD', color: '#0891b2' },
+    { name: 'Vikram Singh', role: 'Frontend Dev', module: 'XBzin Web Services', initials: 'VS', color: '#be185d' },
+    { name: 'Neha Joshi', role: 'AI Researcher', module: 'XBzin AI Hub', initials: 'NJ', color: '#16a34a' },
+    { name: 'Arjun Patel', role: 'DevOps', module: 'XBzin Tools', initials: 'AP', color: '#d97706' },
+    { name: 'Kavita Rao', role: 'Community Manager', module: 'XBzin Community', initials: 'KR', color: '#dc2626' },
+    { name: 'Rahul Mishra', role: 'Data Scientist', module: 'XBzin AI Hub', initials: 'RM', color: '#2563eb' },
+    { name: 'Deepa Shah', role: 'UX Designer', module: 'XBzin Web Services', initials: 'DS', color: '#0891b2' },
+    { name: 'Arun Gupta', role: 'Backend Dev', module: 'XBzin AI Hub', initials: 'AG', color: '#7c3aed' },
+    { name: 'Meera Iyer', role: 'QA Engineer', module: 'XBzin Tools', initials: 'MI', color: '#be185d' },
+    { name: 'Kiran Bose', role: 'Marketing', module: 'XBzin Community', initials: 'KB', color: '#16a34a' },
+    { name: 'Suresh Pillai', role: 'Sales', module: 'Leadership', initials: 'SP', color: '#d97706' },
   ],
 
-  notifications: [
-    {id:1, type:'success', icon:'fa-circle-check',         text:'Patent #3 successfully granted',          time:'2 hours ago',  read:false},
-    {id:2, type:'warning', icon:'fa-indian-rupee-sign',    text:'Funding Round 2 report available',         time:'5 hours ago',  read:false},
-    {id:3, type:'error',   icon:'fa-triangle-exclamation', text:'9 projects pending action required',       time:'1 day ago',    read:false},
-  ],
-
-  activity: [
-    {icon:'fa-circle-check', color:'green', text:'AI Model v2 milestone achieved',      time:'2h ago'},
-    {icon:'fa-upload',       color:'blue',  text:'Funding Round 2 docs uploaded',       time:'5h ago'},
-    {icon:'fa-file-pen',     color:'yellow',text:'Patent PAT-004 submitted for review', time:'1d ago'},
-    {icon:'fa-user-plus',    color:'green', text:'2 new team members onboarded',        time:'3d ago'},
-    {icon:'fa-shield-halved',color:'red',   text:'Security audit scheduled next week',  time:'5d ago'},
+  patents: [
+    { id: 'PAT-001', title: 'AI Inference Engine', desc: 'Core AI processing patent covering model inference optimization and adaptive compute allocation for XBzin AI Hub neural pipeline.', tags: ['AI / ML', 'XBzin AI Hub'], status: 'granted', icon: 'fa-microchip', date: 'FY 2023-24' },
+    { id: 'PAT-002', title: 'Adaptive Web Routing Protocol', desc: 'Unique request-routing system covering intelligent load balancing and dynamic traffic management algorithms for XBzin Web Services.', tags: ['Networking', 'Web Services'], status: 'granted', icon: 'fa-network-wired', date: 'FY 2023-24' },
+    { id: 'PAT-003', title: 'Modular Toolkit Framework', desc: 'Plugin-based extensible toolkit architecture covering modular composition, plugin sandboxing, and runtime extension loading for XBzin Tools.', tags: ['Architecture', 'XBzin Tools'], status: 'granted', icon: 'fa-puzzle-piece', date: 'FY 2024-25' },
+    { id: 'PAT-004', title: 'AI Community Recommendation Engine', desc: 'AI-driven community engagement covering personalized content surfacing and social graph analysis for XBzin Community.', tags: ['Community AI', 'XBzin Community'], status: 'pending', icon: 'fa-people-group', date: 'FY 2024-25' },
   ],
 
   ecosystem: [
-    {id:'ai',      name:'XBzin AI Hub',       icon:'fa-brain',                color:'blue',   status:'live',   uptime:92, patents:2, projects:5, desc:'Centralized AI inference, model management, and intelligent automation layer powering the entire XBzin ecosystem with real-time processing.',tags:'AI · ML · Inference'},
-    {id:'web',     name:'XBzin Web Services', icon:'fa-globe',                color:'green',  status:'live',   uptime:88, patents:1, projects:4, desc:'Scalable web infrastructure, adaptive API gateway, intelligent routing and full-stack delivery platform for enterprise-grade applications.',tags:'Web · API · Cloud'},
-    {id:'tools',   name:'XBzin Tools',        icon:'fa-screwdriver-wrench',   color:'yellow', status:'maint',  uptime:76, patents:1, projects:2, desc:'Modular developer toolkit with extensible plugins, workflow automation utilities and deep third-party integrations.',tags:'Dev · Plugins · CLI'},
-    {id:'community',name:'XBzin Community',   icon:'fa-users-between-lines',  color:'red',    status:'live',   uptime:95, patents:'1(P)', projects:2, desc:'AI-powered community platform fostering collaboration, knowledge sharing, and developer networking at enterprise scale.',tags:'Community · Forums · AI'},
+    { id: 'ai-hub', name: 'XBzin AI Hub', icon: 'fa-brain', iconBg: 'blue-icon-bg', desc: 'Centralized AI inference, model management, intelligent automation, and neural processing layer for the XBzin ecosystem.', patents: 2, projects: 48, members: 6, health: 96, tags: ['AI', 'ML', 'Inference'], fillClass: '' },
+    { id: 'web-services', name: 'XBzin Web Services', icon: 'fa-globe', iconBg: 'green-icon-bg', desc: 'Scalable web infrastructure, API gateway, adaptive routing protocol, and full-stack delivery platform powering all web-facing products.', patents: 1, projects: 55, members: 4, health: 99, tags: ['API', 'Cloud', 'Web'], fillClass: 'green-fill' },
+    { id: 'tools', name: 'XBzin Tools', icon: 'fa-screwdriver-wrench', iconBg: 'yellow-icon-bg', desc: 'Modular developer toolkit with extensible plugins, workflow automation utilities, and integration bridges for the XBzin ecosystem.', patents: 1, projects: 19, members: 3, health: 88, tags: ['DevTools', 'Plugins', 'SDK'], fillClass: 'yellow-fill' },
+    { id: 'community', name: 'XBzin Community', icon: 'fa-users-between-lines', iconBg: 'red-icon-bg', desc: 'AI-powered community platform fostering developer collaboration, knowledge sharing, and peer learning across the XBzin ecosystem.', patents: '1*', projects: 7, members: 3, health: 72, tags: ['Community', 'Social', 'AI'], fillClass: 'red-fill' },
   ],
 
-  settings: {
-    darkMode: false,
-    notifications: true,
-    emailAlerts: true,
-    projectUpdates: true,
-    autoRefresh: false,
-    compactView: false,
-    name: 'Bharat Shukla',
-    email: 'bharat@xbzin.com',
-    phone: '+91 98765 43210',
-  }
+  activities: [
+    { type: 'success', icon: 'fa-circle-check', title: 'Patent PAT-004 filing submitted', meta: 'XBzin AI Hub · Finance', time: '2h ago' },
+    { type: 'info', icon: 'fa-indian-rupee-sign', title: 'Funding Round 2 report generated', meta: 'Finance · Admin', time: '5h ago' },
+    { type: 'warning', icon: 'fa-triangle-exclamation', title: '9 projects awaiting review action', meta: 'Projects · Management', time: '1d ago' },
+    { type: 'success', icon: 'fa-users', title: 'New team member Suresh Pillai added', meta: 'HR · Leadership', time: '2d ago' },
+    { type: 'info', icon: 'fa-chart-line', title: 'Q4 analytics report exported', meta: 'Analytics · Reports', time: '3d ago' },
+    { type: 'success', icon: 'fa-file-shield', title: 'Patent PAT-003 granted by authority', meta: 'Legal · Patents', time: '5d ago' },
+    { type: 'info', icon: 'fa-sack-dollar', title: 'Funding Round 2 ₹19L received', meta: 'Finance · Funding', time: '1w ago' },
+    { type: 'success', icon: 'fa-diagram-project', title: 'Project P-013 completed successfully', meta: 'Projects · XBzin AI Hub', time: '1w ago' },
+  ],
 };
 
-let currentPage  = 'overview';
-let sidebarCollapsed = false;
-let sortConfig   = {col: -1, asc: true};
-let projPage     = 1;
-const ROWS_PER_PAGE = 8;
-let filteredProjects = [...DATA.projects];
-const charts = {};
+/* ────────────────────────────────────
+   STATE
+──────────────────────────────────── */
+const state = {
+  theme: 'light',
+  sidebarCollapsed: false,
+  currentSection: 'overview',
+  projectFilter: 'all',
+  moduleFilter: 'all',
+  projectSearch: '',
+  sortCol: 'id',
+  sortDir: 'asc',
+  page: 1,
+  rowsPerPage: 6,
+  notifCount: 3,
+  autoRefreshInterval: null,
+};
 
-/* ════════════════════════════════════
-   LOADER
-════════════════════════════════════ */
-const LOADER_MSGS = [
-  'Initializing ecosystem...',
-  'Loading project data...',
-  'Connecting to database...',
-  'Fetching analytics...',
-  'Rendering dashboard...',
+/* ────────────────────────────────────
+   UTILS
+──────────────────────────────────── */
+const $ = (s, c = document) => c.querySelector(s);
+const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* ────────────────────────────────────
+   LOADING SCREEN
+──────────────────────────────────── */
+async function runLoadingScreen() {
+  const fill = $('#loadFill');
+  const text = $('#loadText');
+  const msgs = ['Connecting to XBzin servers...', 'Loading ecosystem data...', 'Rendering charts...', 'Almost ready...'];
+  for (let i = 0; i <= 100; i += 2) {
+    await sleep(20);
+    fill.style.width = i + '%';
+    if (i === 20) text.textContent = msgs[1];
+    if (i === 50) text.textContent = msgs[2];
+    if (i === 80) text.textContent = msgs[3];
+  }
+  await sleep(200);
+  $('#loadingScreen').classList.add('hidden');
+}
+
+/* ────────────────────────────────────
+   TOAST
+──────────────────────────────────── */
+function showToast(msg, type = 'info', duration = 3500) {
+  const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', warning: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fa-solid ${icons[type]}"></i><span>${msg}</span><span class="toast-close"><i class="fa-solid fa-xmark"></i></span>`;
+  $('#toastContainer').appendChild(t);
+  t.querySelector('.toast-close').onclick = () => t.remove();
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(20px)';
+    t.style.transition = 'all .3s';
+    setTimeout(() => t.remove(), 300);
+  }, duration);
+}
+
+/* ────────────────────────────────────
+   LIVE CLOCK
+──────────────────────────────────── */
+function updateClock() {
+  const el = $('#liveClock');
+  if (!el) return;
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  el.textContent = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}  ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ────────────────────────────────────
+   THEME TOGGLE
+──────────────────────────────────── */
+function setTheme(dark) {
+  state.theme = dark ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', state.theme);
+  const icon = $('#themeIcon');
+  if (icon) { icon.className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon'; }
+  const dtToggle = $('#darkModeToggle');
+  if (dtToggle) dtToggle.checked = dark;
+  updateAllCharts();
+  showToast(dark ? 'Dark mode enabled' : 'Light mode enabled', 'info', 2000);
+}
+
+$('#themeToggle')?.addEventListener('click', () => setTheme(state.theme === 'light'));
+$('#darkModeToggle')?.addEventListener('change', function () { setTheme(this.checked); });
+
+/* ────────────────────────────────────
+   FULLSCREEN
+──────────────────────────────────── */
+$('#fullscreenBtn')?.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+    $('#fullscreenBtn').querySelector('i').className = 'fa-solid fa-compress';
+    showToast('Fullscreen mode enabled', 'info', 2000);
+  } else {
+    document.exitFullscreen();
+    $('#fullscreenBtn').querySelector('i').className = 'fa-solid fa-expand';
+  }
+});
+
+/* ────────────────────────────────────
+   SIDEBAR
+──────────────────────────────────── */
+const sidebar = $('#sidebar');
+const mainWrapper = $('#mainWrapper');
+const overlay = $('#overlay');
+
+function openSidebarMobile() {
+  sidebar.classList.add('mobile-open');
+  overlay.classList.add('active');
+}
+function closeSidebarMobile() {
+  sidebar.classList.remove('mobile-open');
+  overlay.classList.remove('active');
+}
+function toggleCollapse() {
+  state.sidebarCollapsed = !state.sidebarCollapsed;
+  sidebar.classList.toggle('collapsed', state.sidebarCollapsed);
+  mainWrapper.classList.toggle('collapsed-mw', state.sidebarCollapsed);
+  const compactToggle = $('#compactSidebarToggle');
+  if (compactToggle) compactToggle.checked = state.sidebarCollapsed;
+}
+
+$('#menuToggle')?.addEventListener('click', () => {
+  if (window.innerWidth <= 768) openSidebarMobile();
+  else toggleCollapse();
+});
+$('#sidebarPin')?.addEventListener('click', toggleCollapse);
+overlay.addEventListener('click', closeSidebarMobile);
+$('#compactSidebarToggle')?.addEventListener('change', function () { if (state.sidebarCollapsed !== this.checked) toggleCollapse(); });
+
+/* ────────────────────────────────────
+   NAV + SECTION SWITCHING
+──────────────────────────────────── */
+const navLinks = $$('.nav-link[data-section]');
+
+function switchSection(sectionId) {
+  state.currentSection = sectionId;
+  navLinks.forEach(l => l.classList.toggle('active', l.dataset.section === sectionId));
+  const activeLink = navLinks.find(l => l.dataset.section === sectionId);
+  if (activeLink) $('#bcCurrent').textContent = activeLink.querySelector('.nav-label').textContent;
+  const sec = $(`#${sectionId}`);
+  if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (window.innerWidth <= 768) closeSidebarMobile();
+}
+
+navLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchSection(link.dataset.section);
+  });
+});
+
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY + 120;
+  $$('.pg-section[id]').forEach(sec => {
+    if (sec.offsetTop <= scrollY && sec.offsetTop + sec.offsetHeight > scrollY) {
+      const id = sec.id;
+      if (id !== state.currentSection) {
+        state.currentSection = id;
+        navLinks.forEach(l => l.classList.toggle('active', l.dataset.section === id));
+        const activeLink = navLinks.find(l => l.dataset.section === id);
+        if (activeLink) $('#bcCurrent').textContent = activeLink.querySelector('.nav-label').textContent;
+      }
+    }
+  });
+}, { passive: true });
+
+/* ────────────────────────────────────
+   NOTIFICATIONS
+──────────────────────────────────── */
+const notifPanel = $('#notifPanel');
+$('#notifTrigger')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  notifPanel.classList.toggle('open');
+  $('#profileDropdown')?.classList.add('hidden');
+});
+$('#clearAllNotif')?.addEventListener('click', () => {
+  $$('.np-item.unread').forEach(i => i.classList.remove('unread'));
+  state.notifCount = 0;
+  updateNotifBadge();
+  showToast('All notifications marked as read', 'success', 2500);
+});
+$$('.np-x').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const item = btn.closest('.np-item');
+    if (item.classList.contains('unread')) {
+      state.notifCount = Math.max(0, state.notifCount - 1);
+      updateNotifBadge();
+    }
+    item.style.opacity = '0';
+    item.style.transform = 'translateX(20px)';
+    item.style.transition = 'all .2s';
+    setTimeout(() => item.remove(), 200);
+  });
+});
+function updateNotifBadge() {
+  const b = $('#notifBadge');
+  if (!b) return;
+  b.textContent = state.notifCount;
+  b.style.display = state.notifCount > 0 ? 'flex' : 'none';
+}
+
+/* ────────────────────────────────────
+   PROFILE DROPDOWN
+──────────────────────────────────── */
+$('#profileBtn')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const pd = $('#profileDropdown');
+  pd.classList.toggle('hidden');
+  notifPanel.classList.remove('open');
+});
+document.addEventListener('click', () => {
+  $('#profileDropdown')?.classList.add('hidden');
+  notifPanel.classList.remove('open');
+});
+
+/* ────────────────────────────────────
+   COMMAND PALETTE
+──────────────────────────────────── */
+const cmdItems = [
+  { label: 'Overview Dashboard', section: 'overview', icon: 'fa-gauge-high' },
+  { label: 'Analytics & Charts', section: 'analytics', icon: 'fa-chart-mixed' },
+  { label: 'Project Management', section: 'projects', icon: 'fa-diagram-project' },
+  { label: 'Funding & Investment', section: 'funding', icon: 'fa-indian-rupee-sign' },
+  { label: 'Patent Tracker', section: 'patents', icon: 'fa-file-shield' },
+  { label: 'Ecosystem Modules', section: 'ecosystem', icon: 'fa-cubes' },
+  { label: 'Team Directory', section: 'team', icon: 'fa-users' },
+  { label: 'Activity Log', section: 'activity', icon: 'fa-bolt' },
+  { label: 'Dashboard Settings', section: 'settings', icon: 'fa-gear' },
+  { label: 'Total Employees: 16', section: 'overview', icon: 'fa-users' },
+  { label: 'Company Valuation: ₹1 Crore', section: 'funding', icon: 'fa-building' },
+  { label: 'Projects Completed: 129', section: 'projects', icon: 'fa-circle-check' },
+  { label: 'Total Patents: 4', section: 'patents', icon: 'fa-file-shield' },
 ];
 
-function initLoader() {
-  const fill   = document.getElementById('lpFill');
-  const status = document.getElementById('loaderStatus');
-  let pct = 0, msgIdx = 0;
-  const iv = setInterval(() => {
-    pct += Math.random() * 18 + 4;
-    if (pct > 100) pct = 100;
-    fill.style.width = pct + '%';
-    if (pct > msgIdx * 20 && msgIdx < LOADER_MSGS.length) {
-      status.textContent = LOADER_MSGS[msgIdx++];
+let cmdSelected = -1;
+
+function openCmdPalette() {
+  const p = $('#cmdPalette');
+  p.classList.remove('hidden');
+  $('#cmdInput').value = '';
+  renderCmdResults('');
+  setTimeout(() => $('#cmdInput').focus(), 50);
+}
+function closeCmdPalette() {
+  $('#cmdPalette').classList.add('hidden');
+  cmdSelected = -1;
+}
+function renderCmdResults(q) {
+  const results = q ? cmdItems.filter(i => i.label.toLowerCase().includes(q.toLowerCase())) : cmdItems;
+  const c = $('#cmdResults');
+  c.innerHTML = results.length ? results.map((r, i) =>
+    `<div class="cmd-result-item${i === cmdSelected ? ' active' : ''}" data-idx="${i}" data-section="${r.section}">
+      <i class="fa-solid ${r.icon}"></i><span>${r.label}</span><span class="cmd-section">${r.section}</span>
+    </div>`
+  ).join('') : `<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">No results found</div>`;
+  $$('.cmd-result-item').forEach(el => {
+    el.addEventListener('click', () => {
+      switchSection(el.dataset.section);
+      closeCmdPalette();
+    });
+  });
+}
+$('#cmdInput')?.addEventListener('input', function () { cmdSelected = -1; renderCmdResults(this.value); });
+$('#cmdInput')?.addEventListener('keydown', (e) => {
+  const items = $$('.cmd-result-item');
+  if (e.key === 'ArrowDown') { cmdSelected = Math.min(cmdSelected + 1, items.length - 1); }
+  if (e.key === 'ArrowUp') { cmdSelected = Math.max(cmdSelected - 1, 0); }
+  if (e.key === 'Enter' && cmdSelected >= 0 && items[cmdSelected]) { items[cmdSelected].click(); }
+  if (e.key === 'Escape') closeCmdPalette();
+  renderCmdResults($('#cmdInput').value);
+});
+$('#cmdTrigger')?.addEventListener('click', openCmdPalette);
+$('#cmdTriggerSidebar')?.addEventListener('click', openCmdPalette);
+$('#cmdBackdrop')?.addEventListener('click', closeCmdPalette);
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openCmdPalette(); }
+  if (e.key === 'Escape') closeCmdPalette();
+});
+
+/* ────────────────────────────────────
+   COUNTER ANIMATION
+──────────────────────────────────── */
+function animateCounter(el, target, duration = 1400) {
+  const start = performance.now();
+  const step = (now) => {
+    const p = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.floor(ease * target);
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  };
+  requestAnimationFrame(step);
+}
+const counterObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target;
+      animateCounter(el, parseInt(el.dataset.target));
+      counterObs.unobserve(el);
     }
-    if (pct >= 100) {
-      clearInterval(iv);
-      setTimeout(() => {
-        document.getElementById('loaderScreen').classList.add('hidden');
-        initDashboard();
-      }, 400);
-    }
-  }, 120);
+  });
+}, { threshold: 0.5 });
+$$('[data-target]').forEach(el => counterObs.observe(el));
+
+/* ────────────────────────────────────
+   SPARKLINE CHARTS
+──────────────────────────────────── */
+function drawSparkline(canvas, values, color = '#2563eb') {
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 200;
+  canvas.height = 40;
+  const w = canvas.width, h = canvas.height;
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 1;
+  const pts = values.map((v, i) => ({ x: (i / (values.length - 1)) * w, y: h - ((v - min) / range) * (h - 6) - 3 }));
+  ctx.clearRect(0, 0, w, h);
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length; i++) {
+    const cx = (pts[i - 1].x + pts[i].x) / 2;
+    ctx.bezierCurveTo(cx, pts[i - 1].y, cx, pts[i].y, pts[i].x, pts[i].y);
+  }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.lineTo(pts[pts.length - 1].x, h);
+  ctx.lineTo(pts[0].x, h);
+  ctx.closePath();
+  ctx.fillStyle = color + '18';
+  ctx.fill();
 }
 
-/* ════════════════════════════════════
-   INIT
-════════════════════════════════════ */
-function initDashboard() {
-  initChartDefaults();
-  initSidebar();
-  initTopbar();
-  initSearch();
-  initNotifications();
-  initLiveClock();
-  initKPICounters();
-  buildActivityFeed();
-  buildHealthList();
-  buildTeamGrid();
-  buildEcoGrid();
-  buildPatentCards();
-  buildProjectsTable();
-  buildSettingsPage();
-  initCharts();
-  initKPIBars();
-  showToast('XBzin Dashboard loaded successfully!', 'success');
+function initSparklines() {
+  $$('.spark-canvas').forEach(canvas => {
+    const vals = canvas.dataset.vals.split(',').map(Number);
+    const color = canvas.dataset.color || '#2563eb';
+    setTimeout(() => drawSparkline(canvas, vals, color), 100);
+  });
 }
 
-/* ════════════════════════════════════
-   CHART DEFAULTS
-════════════════════════════════════ */
-function initChartDefaults() {
-  Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-  Chart.defaults.font.size   = 12;
-  Chart.defaults.color       = getComputedStyle(document.body).getPropertyValue('--text2') || '#475569';
-  Chart.defaults.plugins.legend.display = false;
-  Chart.defaults.plugins.tooltip.backgroundColor = '#0f172a';
-  Chart.defaults.plugins.tooltip.titleColor = '#f1f5f9';
-  Chart.defaults.plugins.tooltip.bodyColor   = '#94a3b8';
-  Chart.defaults.plugins.tooltip.padding     = 12;
-  Chart.defaults.plugins.tooltip.cornerRadius = 10;
+/* ────────────────────────────────────
+   CHART.JS SETUP
+──────────────────────────────────── */
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.plugins.legend.display = false;
+Chart.defaults.animation.duration = 900;
+
+const C = { green: '#16a34a', yellow: '#d97706', red: '#dc2626', blue: '#2563eb', black: '#0f172a' };
+const chartInstances = {};
+
+function getTextColor() {
+  return state.theme === 'dark' ? '#94a3b8' : '#64748b';
+}
+function getGridColor() {
+  return state.theme === 'dark' ? '#334155' : '#f1f5f9';
+}
+function tooltipConfig() {
+  return {
+    backgroundColor: state.theme === 'dark' ? '#1e293b' : '#0f172a',
+    titleColor: '#fff', bodyColor: '#94a3b8',
+    padding: 12, cornerRadius: 10, borderWidth: 1,
+    borderColor: state.theme === 'dark' ? '#334155' : '#1e293b',
+  };
 }
 
-const C = { blue:'#2563eb', green:'#16a34a', yellow:'#d97706', red:'#dc2626', black:'#0f172a' };
-
-/* ════════════════════════════════════
-   ALL CHARTS
-════════════════════════════════════ */
-function initCharts() {
-  buildProjLineChart(12);
-  buildProjDonutChart();
-  buildProjBarChart();
-  buildProjModuleChart();
-  buildFundBarChart();
-  buildInvestLineChart();
-  buildPatPieChart();
-  buildRevenueChart(6);
-  buildTeamChart(6);
-  buildRadarChart();
-}
-
-function buildProjLineChart(months) {
-  const ctx = document.getElementById('projLineChart');
+function initProjectChart() {
+  const ctx = $('#projectChart');
   if (!ctx) return;
-  if (charts.projLine) charts.projLine.destroy();
-  const labels = getLast(months,'month');
-  const data   = genData(months, 8, 16);
-  charts.projLine = new Chart(ctx, {
-    type: 'line',
+  if (chartInstances.project) chartInstances.project.destroy();
+  chartInstances.project = new Chart(ctx.getContext('2d'), {
+    type: 'doughnut',
     data: {
-      labels,
-      datasets: [{
-        label:'Projects Delivered',
-        data,
-        borderColor: C.blue,
-        backgroundColor: 'rgba(37,99,235,.08)',
-        fill: true,
-        tension: 0.4,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        pointBackgroundColor: C.blue,
-        borderWidth: 2.5,
-      }]
+      labels: ['Completed', 'Ongoing', 'Pending'],
+      datasets: [{ data: [129, 4, 9], backgroundColor: [C.green, C.yellow, C.red], borderColor: 'transparent', borderWidth: 3, hoverOffset: 10 }],
+    },
+    options: { cutout: '72%', responsive: true, maintainAspectRatio: false, plugins: { tooltip: { ...tooltipConfig(), callbacks: { label: c => ` ${c.label}: ${c.raw} projects` } } } },
+  });
+}
+
+function initFundingChart() {
+  const ctx = $('#fundingChart');
+  if (!ctx) return;
+  if (chartInstances.funding) chartInstances.funding.destroy();
+  const tc = getTextColor(), gc = getGridColor();
+  chartInstances.funding = new Chart(ctx.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Round 1 (Seed)', 'Round 2 (Series A)'],
+      datasets: [{ label: 'Amount (₹L)', data: [16, 19], backgroundColor: [C.blue, C.green], borderRadius: 10, borderSkipped: false, maxBarThickness: 70 }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       scales: {
-        x: { grid:{ display:false }, border:{ display:false } },
-        y: { beginAtZero:true, grid:{ color:'rgba(0,0,0,.04)' }, border:{ display:false }, ticks:{ stepSize:4 } }
+        x: { grid: { display: false }, border: { display: false }, ticks: { color: tc } },
+        y: { beginAtZero: true, max: 25, ticks: { callback: v => `₹${v}L`, color: tc, stepSize: 5 }, grid: { color: gc }, border: { display: false } },
       },
-      plugins: { legend:{ display:false } },
-      animation: { duration: 800 }
-    }
+      plugins: { tooltip: { ...tooltipConfig(), callbacks: { label: c => ` ₹${c.raw} Lakhs` } } },
+    },
   });
 }
 
-function buildProjDonutChart() {
-  const ctx = document.getElementById('projDonutChart');
+function initInvestChart() {
+  const ctx = $('#investChart');
   if (!ctx) return;
-  if (charts.projDonut) charts.projDonut.destroy();
-  charts.projDonut = new Chart(ctx, {
-    type: 'doughnut',
+  if (chartInstances.invest) chartInstances.invest.destroy();
+  const tc = getTextColor(), gc = getGridColor();
+  chartInstances.invest = new Chart(ctx.getContext('2d'), {
+    type: 'line',
     data: {
-      labels:['Completed','Ongoing','Pending'],
-      datasets:[{ data:[129,4,9], backgroundColor:[C.green,C.yellow,C.red], borderWidth:3, borderColor:'#ffffff', hoverOffset:8 }]
+      labels: ['Q1 FY23', 'Q2 FY23', 'Q3 FY23', 'Q4 FY23', 'Q1 FY24', 'Q2 FY24', 'Q3 FY24', 'Q4 FY24', 'Q1 FY25'],
+      datasets: [
+        { label: 'Investment', data: [0, 5, 10, 16, 16, 30, 35, 38, 43], borderColor: C.blue, backgroundColor: C.blue + '12', pointBackgroundColor: C.blue, pointRadius: 4, pointHoverRadius: 7, tension: 0.45, fill: true, borderWidth: 2.5 },
+        { label: 'Fund Used', data: [5, 12, 22, 30, 38, 48, 58, 68, 78], borderColor: C.red, backgroundColor: C.red + '0e', pointBackgroundColor: C.red, pointRadius: 4, pointHoverRadius: 7, tension: 0.45, fill: true, borderWidth: 2.5 },
+      ],
     },
     options: {
-      cutout:'72%', responsive:true, maintainAspectRatio:false,
-      plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label:ctx=>`${ctx.label}: ${ctx.raw}` } } },
-      animation:{ animateScale:true, duration:900 }
-    }
-  });
-}
-
-function buildProjBarChart() {
-  const ctx = document.getElementById('projBarChart');
-  if (!ctx) return;
-  if (charts.projBar) charts.projBar.destroy();
-  charts.projBar = new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels:['Completed','Ongoing','Pending'],
-      datasets:[{ data:[129,4,9], backgroundColor:[C.green,C.yellow,C.red], borderRadius:10, borderSkipped:false, maxBarThickness:60 }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      scales:{
-        x:{ grid:{ display:false }, border:{ display:false } },
-        y:{ beginAtZero:true, grid:{ color:'rgba(0,0,0,.04)' }, border:{ display:false } }
+      responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { color: tc } },
+        y: { beginAtZero: true, ticks: { callback: v => `₹${v}L`, color: tc }, grid: { color: gc }, border: { display: false } },
       },
-      plugins:{ legend:{ display:false } },
-      animation:{ duration:800 }
-    }
-  });
-}
-
-function buildProjModuleChart() {
-  const ctx = document.getElementById('projModuleChart');
-  if (!ctx) return;
-  if (charts.projModule) charts.projModule.destroy();
-  charts.projModule = new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels:['AI Hub','Web Services','Tools','Community'],
-      datasets:[
-        { label:'Completed', data:[35,40,30,24], backgroundColor:C.green, borderRadius:6, borderSkipped:false },
-        { label:'Ongoing',   data:[2,1,1,0],     backgroundColor:C.yellow, borderRadius:6, borderSkipped:false },
-        { label:'Pending',   data:[3,3,2,1],     backgroundColor:C.red,   borderRadius:6, borderSkipped:false },
-      ]
+      plugins: { tooltip: { ...tooltipConfig(), callbacks: { label: c => ` ${c.dataset.label}: ₹${c.raw}L` } } },
     },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      scales:{
-        x:{ stacked:true, grid:{ display:false }, border:{ display:false } },
-        y:{ stacked:true, beginAtZero:true, grid:{ color:'rgba(0,0,0,.04)' }, border:{ display:false } }
-      },
-      plugins:{ legend:{ display:true, position:'bottom', labels:{ boxWidth:10, padding:16 } } },
-      animation:{ duration:800 }
-    }
   });
 }
 
-function buildFundBarChart() {
-  const ctx = document.getElementById('fundBarChart');
+function initPatentChart() {
+  const ctx = $('#patentChart');
   if (!ctx) return;
-  if (charts.fundBar) charts.fundBar.destroy();
-  charts.fundBar = new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels:['Round 1 (Seed)','Round 2 (Series A)'],
-      datasets:[{ data:[16,19], backgroundColor:[C.blue,C.green], borderRadius:12, borderSkipped:false, maxBarThickness:70 }]
+  if (chartInstances.patent) chartInstances.patent.destroy();
+  chartInstances.patent = new Chart(ctx.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Granted', 'Pending'],
+      datasets: [{ data: [3, 1], backgroundColor: [C.green, C.yellow], borderColor: 'transparent', borderWidth: 3, hoverOffset: 8 }],
     },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      scales:{
-        x:{ grid:{ display:false }, border:{ display:false } },
-        y:{ beginAtZero:true, max:25, ticks:{ callback:v=>`₹${v}L` }, grid:{ color:'rgba(0,0,0,.04)' }, border:{ display:false } }
-      },
-      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:ctx=>`₹${ctx.raw} Lakhs` } } },
-      animation:{ duration:800 }
-    }
+    options: { cutout: '72%', responsive: true, maintainAspectRatio: false, plugins: { tooltip: { ...tooltipConfig(), callbacks: { label: c => ` ${c.label}: ${c.raw} patent${c.raw > 1 ? 's' : ''}` } } } },
   });
 }
 
-function buildInvestLineChart() {
-  const ctx = document.getElementById('investLineChart');
-  if (!ctx) return;
-  if (charts.investLine) charts.investLine.destroy();
-  charts.investLine = new Chart(ctx, {
-    type:'line',
-    data:{
-      labels:['Q1 FY24','Q2 FY24','Q3 FY24','Q4 FY24','Q1 FY25','Q2 FY25'],
-      datasets:[
-        { label:'Total Investment (₹L)', data:[10,20,30,38,43,43], borderColor:C.blue, backgroundColor:'rgba(37,99,235,.06)', fill:true, tension:0.4, pointRadius:4, pointBackgroundColor:C.blue, borderWidth:2.5 },
-        { label:'Fund Utilized (₹L)',    data:[12,28,45,62,73,78], borderColor:C.red,  backgroundColor:'rgba(220,38,38,.05)',  fill:true, tension:0.4, pointRadius:4, pointBackgroundColor:C.red,  borderWidth:2.5 },
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      interaction:{ mode:'index', intersect:false },
-      scales:{
-        x:{ grid:{ display:false }, border:{ display:false } },
-        y:{ beginAtZero:true, ticks:{ callback:v=>`₹${v}L` }, grid:{ color:'rgba(0,0,0,.04)' }, border:{ display:false } }
-      },
-      plugins:{ legend:{ display:true, position:'bottom', labels:{ boxWidth:10, padding:16 } }, tooltip:{ callbacks:{ label:ctx=>`${ctx.dataset.label}: ₹${ctx.raw}L` } } },
-      animation:{ duration:900 }
-    }
-  });
+function initAllCharts() {
+  initProjectChart();
+  initFundingChart();
+  initInvestChart();
+  initPatentChart();
+}
+function updateAllCharts() {
+  setTimeout(() => {
+    initAllCharts();
+  }, 50);
 }
 
-function buildPatPieChart() {
-  const ctx = document.getElementById('patPieChart');
-  if (!ctx) return;
-  if (charts.patPie) charts.patPie.destroy();
-  charts.patPie = new Chart(ctx, {
-    type:'doughnut',
-    data:{
-      labels:['Granted','Pending'],
-      datasets:[{ data:[3,1], backgroundColor:[C.green,C.yellow], borderWidth:3, borderColor:'#ffffff', hoverOffset:6 }]
-    },
-    options:{
-      cutout:'68%', responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ display:false } },
-      animation:{ animateScale:true, duration:800 }
-    }
-  });
+/* ────────────────────────────────────
+   CHART EXPORT
+──────────────────────────────────── */
+function downloadChart(chartId, name = 'chart') {
+  const canvas = $(`#${chartId}`);
+  if (!canvas) return;
+  const link = document.createElement('a');
+  link.download = `xbzin-${name.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast(`Chart "${name}" downloaded!`, 'success');
 }
 
-function buildRevenueChart(months) {
-  const ctx = document.getElementById('revenueChart');
-  if (!ctx) return;
-  if (charts.revenue) charts.revenue.destroy();
-  const labels = getLast(months, 'month');
-  charts.revenue = new Chart(ctx, {
-    type:'line',
-    data:{
-      labels,
-      datasets:[{ label:'Revenue (₹L)', data:genData(months,5,18), borderColor:C.green, backgroundColor:'rgba(22,163,74,.08)', fill:true, tension:0.4, pointRadius:4, pointBackgroundColor:C.green, borderWidth:2.5 }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      scales:{
-        x:{ grid:{ display:false }, border:{ display:false } },
-        y:{ beginAtZero:true, ticks:{ callback:v=>`₹${v}L` }, grid:{ color:'rgba(0,0,0,.04)' }, border:{ display:false } }
-      },
-      plugins:{ legend:{ display:false } },
-      animation:{ duration:800 }
-    }
-  });
-}
-
-function buildTeamChart(months) {
-  const ctx = document.getElementById('teamChart');
-  if (!ctx) return;
-  if (charts.team) charts.team.destroy();
-  const labels = getLast(months, 'month');
-  const base = [8,9,10,11,14,16];
-  charts.team = new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels,
-      datasets:[{ label:'Headcount', data:base.slice(-months), backgroundColor:C.blue, borderRadius:8, borderSkipped:false }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      scales:{
-        x:{ grid:{ display:false }, border:{ display:false } },
-        y:{ beginAtZero:true, ticks:{ stepSize:2 }, grid:{ color:'rgba(0,0,0,.04)' }, border:{ display:false } }
-      },
-      plugins:{ legend:{ display:false } },
-      animation:{ duration:800 }
-    }
-  });
-}
-
-function buildRadarChart() {
-  const ctx = document.getElementById('radarChart');
-  if (!ctx) return;
-  if (charts.radar) charts.radar.destroy();
-  charts.radar = new Chart(ctx, {
-    type:'radar',
-    data:{
-      labels:['Innovation','Delivery','Team Health','Financial','IP Portfolio','Community'],
-      datasets:[
-        { label:'AI Hub',      data:[95,88,82,75,90,70], borderColor:C.blue,   backgroundColor:'rgba(37,99,235,.1)',  borderWidth:2, pointBackgroundColor:C.blue   },
-        { label:'Web Services',data:[80,92,85,80,75,65], borderColor:C.green,  backgroundColor:'rgba(22,163,74,.1)',  borderWidth:2, pointBackgroundColor:C.green  },
-        { label:'Tools',       data:[75,70,78,60,70,55], borderColor:C.yellow, backgroundColor:'rgba(217,119,6,.1)',  borderWidth:2, pointBackgroundColor:C.yellow },
-        { label:'Community',   data:[85,75,88,65,60,95], borderColor:C.red,    backgroundColor:'rgba(220,38,38,.1)',  borderWidth:2, pointBackgroundColor:C.red    },
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      scales:{ r:{ beginAtZero:true, max:100, ticks:{ stepSize:25, font:{ size:10 } }, grid:{ color:'rgba(0,0,0,.06)' }, pointLabels:{ font:{ size:12, weight:600 } } } },
-      plugins:{ legend:{ display:true, position:'bottom', labels:{ boxWidth:10, padding:16 } } },
-      animation:{ duration:900 }
-    }
-  });
-}
-
-/* update proj line chart from filter */
-function updateProjLine(months) { buildProjLineChart(parseInt(months)); }
-function updateAnalytics(months) {
-  buildRevenueChart(parseInt(months));
-  buildTeamChart(parseInt(months));
-}
-
-/* ════════════════════════════════════
-   SIDEBAR
-════════════════════════════════════ */
-function initSidebar() {
-  const colBtn  = document.getElementById('sbCollapseBtn');
-  const ham     = document.getElementById('hamburger');
-  const overlay = document.getElementById('sbOverlay');
-  const links   = document.querySelectorAll('.sb-link[data-page]');
-
-  colBtn.addEventListener('click', () => {
-    sidebarCollapsed = !sidebarCollapsed;
-    document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
-    document.getElementById('mainWrap').classList.toggle('expanded', sidebarCollapsed);
-    colBtn.querySelector('i').style.transform = sidebarCollapsed ? 'rotate(180deg)' : '';
-  });
-
-  ham.addEventListener('click', () => {
-    const sb = document.getElementById('sidebar');
-    const isMobile = window.innerWidth <= 768;
-    if (isMobile) {
-      sb.classList.toggle('mobile-open');
-      overlay.classList.toggle('show');
-    } else {
-      sidebarCollapsed = !sidebarCollapsed;
-      sb.classList.toggle('collapsed', sidebarCollapsed);
-      document.getElementById('mainWrap').classList.toggle('expanded', sidebarCollapsed);
-    }
-  });
-
-  overlay.addEventListener('click', () => {
-    document.getElementById('sidebar').classList.remove('mobile-open');
-    overlay.classList.remove('show');
-  });
-
-  links.forEach(link => {
-    link.addEventListener('click', e => {
-      e.preventDefault();
-      navigateTo(link.dataset.page);
-      if (window.innerWidth <= 768) {
-        document.getElementById('sidebar').classList.remove('mobile-open');
-        overlay.classList.remove('show');
-      }
-    });
-  });
-
-  // Sidebar search filter
-  document.getElementById('sbSearch').addEventListener('input', function () {
-    const q = this.value.toLowerCase();
-    document.querySelectorAll('.sb-link').forEach(l => {
-      const txt = l.querySelector('.sbl-tx');
-      if (!txt) return;
-      l.style.display = txt.textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-  });
-}
-
-/* ════════════════════════════════════
-   NAVIGATION
-════════════════════════════════════ */
-function navigateTo(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
-
-  const target = document.getElementById(`page-${page}`);
-  if (target) target.classList.add('active');
-
-  const link = document.querySelector(`.sb-link[data-page="${page}"]`);
-  if (link) link.classList.add('active');
-
-  const labels = {
-    overview:'Overview', projects:'Projects', funding:'Funding', patents:'Patents',
-    ecosystem:'Modules', analytics:'Analytics', team:'Team', settings:'Settings', reports:'Reports'
-  };
-  document.getElementById('bcPage').textContent = labels[page] || page;
-  currentPage = page;
-
-  // Lazy init per-page things
-  if (page === 'settings') renderSettings('general');
-  if (page === 'analytics') setTimeout(() => { buildRevenueChart(6); buildTeamChart(6); buildRadarChart(); }, 50);
-
-  window.scrollTo(0,0);
-}
-
-/* ════════════════════════════════════
-   TOPBAR
-════════════════════════════════════ */
-function initTopbar() {
-  // Theme
-  document.getElementById('themeBtn').addEventListener('click', toggleTheme);
-
-  // Notifications
-  document.getElementById('notifBtn').addEventListener('click', e => {
-    e.stopPropagation();
-    document.getElementById('notifPanel').classList.toggle('open');
-    document.getElementById('profileMenu').classList.remove('open');
-    document.getElementById('gs-results') && document.getElementById('gsResults').classList.remove('open');
-    document.querySelector('.profile-wrap') && document.querySelector('.profile-wrap').classList.remove('open');
-  });
-
-  // Profile
-  document.getElementById('profileBtn').addEventListener('click', e => {
-    e.stopPropagation();
-    document.getElementById('profileMenu').classList.toggle('open');
-    document.querySelector('.profile-wrap').classList.toggle('open');
-    document.getElementById('notifPanel').classList.remove('open');
-  });
-
-  document.addEventListener('click', () => {
-    document.getElementById('notifPanel').classList.remove('open');
-    document.getElementById('profileMenu').classList.remove('open');
-    document.querySelector('.profile-wrap') && document.querySelector('.profile-wrap').classList.remove('open');
-  });
-}
-
-/* ════════════════════════════════════
-   GLOBAL SEARCH
-════════════════════════════════════ */
-function initSearch() {
-  const input   = document.getElementById('gsInput');
-  const results = document.getElementById('gsResults');
-
-  const searchItems = [
-    ...DATA.projects.map(p => ({ label:p.name, sub:p.module, icon:'fa-diagram-project', page:'projects' })),
-    ...DATA.patents.map(p  => ({ label:p.title, sub:p.module, icon:'fa-file-shield', page:'patents' })),
-    { label:'Overview Dashboard', sub:'Main',    icon:'fa-gauge-high',    page:'overview' },
-    { label:'Team Management',    sub:'HR',      icon:'fa-users',         page:'team' },
-    { label:'Funding & Investment',sub:'Finance',icon:'fa-sack-dollar',   page:'funding' },
-    { label:'Analytics',          sub:'Reports', icon:'fa-chart-mixed',   page:'analytics' },
-    { label:'Settings',           sub:'System',  icon:'fa-gear',          page:'settings' },
-    { label:'Reports',            sub:'Export',  icon:'fa-file-chart-column', page:'reports' },
-  ];
-
-  input.addEventListener('input', function () {
-    const q = this.value.trim().toLowerCase();
-    if (!q) { results.classList.remove('open'); return; }
-    const found = searchItems.filter(i => i.label.toLowerCase().includes(q) || i.sub.toLowerCase().includes(q));
-    if (!found.length) { results.innerHTML = `<div class="gsr-item"><i class="fa-solid fa-search-minus"></i> No results found</div>`; results.classList.add('open'); return; }
-    results.innerHTML = `<div class="gsr-cat">Results</div>` + found.slice(0,6).map(i =>
-      `<div class="gsr-item" onclick="navigateTo('${i.page}');document.getElementById('gsInput').value='';document.getElementById('gsResults').classList.remove('open')">
-         <i class="fa-solid ${i.icon}"></i><span>${i.label} <small style="color:var(--text3)">— ${i.sub}</small></span>
-       </div>`
-    ).join('');
-    results.classList.add('open');
-  });
-
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { input.value=''; results.classList.remove('open'); }
-  });
-  document.addEventListener('click', e => { if (!e.target.closest('.gsearch')) results.classList.remove('open'); });
-
-  // CMD+K shortcut
-  document.addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); input.focus(); }
-  });
-}
-
-/* ════════════════════════════════════
-   NOTIFICATIONS
-════════════════════════════════════ */
-function initNotifications() {
-  renderNotifications();
-}
-
-function renderNotifications() {
-  const body  = document.getElementById('npBody');
-  const badge = document.getElementById('nBadge');
-  const unread = DATA.notifications.filter(n => !n.read);
-  badge.textContent = unread.length;
-  badge.style.display = unread.length ? '' : 'none';
-
-  body.innerHTML = DATA.notifications.map(n => `
-    <div class="ni ${n.read ? '' : 'unread'}" id="ni-${n.id}">
-      <div class="ni-ic ${n.type}"><i class="fa-solid ${n.icon}"></i></div>
-      <div class="ni-body">
-        <p class="ni-text">${n.text}</p>
-        <p class="ni-time">${n.time}</p>
-      </div>
-      <button class="ni-x" onclick="dismissNotif(${n.id})"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-  `).join('');
-}
-
-function dismissNotif(id) {
-  DATA.notifications = DATA.notifications.filter(n => n.id !== id);
-  renderNotifications();
-  showToast('Notification dismissed', 'info');
-}
-
-function markAllNotifs() {
-  DATA.notifications.forEach(n => n.read = true);
-  renderNotifications();
-  showToast('All notifications marked as read', 'success');
-}
-
-/* ════════════════════════════════════
-   LIVE CLOCK
-════════════════════════════════════ */
-function initLiveClock() {
-  function tick() {
-    const now = new Date();
-    const str = now.toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' });
-    const lv  = document.getElementById('liveTime');
-    const fv  = document.getElementById('footerClock');
-    if (lv) lv.textContent = str;
-    if (fv) fv.textContent = str;
+/* ────────────────────────────────────
+   CHART EXPAND
+──────────────────────────────────── */
+function expandChart(cardId, title = 'Chart') {
+  const modal = $('#chartExpandModal');
+  const canvas = $(`#${cardId} canvas`);
+  if (!modal || !canvas) return;
+  $('#cemTitle').textContent = title;
+  modal.classList.remove('hidden');
+  const expandedCanvas = $('#expandedChartCanvas');
+  const chart = Object.values(chartInstances).find(c => c.canvas.id === canvas.id);
+  if (chart && expandedCanvas) {
+    if (window._expandedChartInst) window._expandedChartInst.destroy();
+    window._expandedChartInst = new Chart(expandedCanvas, JSON.parse(JSON.stringify({ type: chart.config.type, data: chart.data, options: { ...chart.options, animation: { duration: 400 } } })));
   }
-  tick();
-  setInterval(tick, 1000);
+}
+function closeExpandModal() {
+  $('#chartExpandModal')?.classList.add('hidden');
+  if (window._expandedChartInst) { window._expandedChartInst.destroy(); window._expandedChartInst = null; }
 }
 
-/* ════════════════════════════════════
-   KPI COUNTER ANIMATION
-════════════════════════════════════ */
-function initKPICounters() {
-  const els = document.querySelectorAll('[data-target]');
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      const el = e.target;
-      const target = parseInt(el.dataset.target);
-      let cur = 0;
-      const dur = 1200;
-      const step = target / (dur / 16);
-      const iv = setInterval(() => {
-        cur += step;
-        if (cur >= target) { cur = target; clearInterval(iv); }
-        el.textContent = Math.floor(cur).toLocaleString();
-      }, 16);
-      obs.unobserve(el);
-    });
-  }, { threshold: 0.4 });
-  els.forEach(el => obs.observe(el));
-}
-
-/* KPI bar animation */
-function initKPIBars() {
-  const bars = document.querySelectorAll('.kc-fill');
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      e.target.style.width = 'var(--p)';
-      obs.unobserve(e.target);
-    });
-  }, { threshold: 0.3 });
-  bars.forEach(b => { b.style.width = '0'; obs.observe(b); });
-}
-
-/* ════════════════════════════════════
-   ACTIVITY FEED
-════════════════════════════════════ */
-function buildActivityFeed() {
-  const feed = document.getElementById('activityFeed');
-  if (!feed) return;
-  feed.innerHTML = DATA.activity.map(a => `
-    <div class="act-item">
-      <div class="act-ic ${a.color}"><i class="fa-solid ${a.icon}"></i></div>
-      <div>
-        <p class="act-text">${a.text}</p>
-        <p class="act-time">${a.time}</p>
-      </div>
-    </div>
-  `).join('');
-}
-
-/* ════════════════════════════════════
-   ECOSYSTEM HEALTH LIST
-════════════════════════════════════ */
-function buildHealthList() {
-  const el = document.getElementById('healthList');
-  if (!el) return;
-  const items = [
-    { name:'XBzin AI Hub',      icon:'fa-brain',                color:'blue',   uptime:92, status:'Operational', st:'green' },
-    { name:'Web Services',       icon:'fa-globe',                color:'green',  uptime:88, status:'Operational', st:'green' },
-    { name:'XBzin Tools',        icon:'fa-screwdriver-wrench',   color:'yellow', uptime:76, status:'Maintenance',  st:'yellow' },
-    { name:'Community Platform', icon:'fa-users-between-lines',  color:'red',    uptime:95, status:'Operational', st:'green' },
-  ];
-  el.innerHTML = items.map(i => `
-    <div class="hl-item">
-      <div class="hl-icon ${i.color}-wrap"><i class="fa-solid ${i.icon}"></i></div>
-      <div><p class="hl-name">${i.name}</p><p class="hl-status ${i.st}">${i.status}</p></div>
-      <div class="hl-bar-wrap">
-        <div class="hl-bar"><div class="hl-fill ${i.color}-fill" style="--p:${i.uptime}%"></div></div>
-        <span class="hl-pct">${i.uptime}%</span>
-      </div>
-    </div>
-  `).join('');
-  // animate bars
-  setTimeout(() => {
-    el.querySelectorAll('.hl-fill').forEach(b => { b.style.width = 'var(--p)'; });
-  }, 400);
-}
-
-/* ════════════════════════════════════
-   TEAM GRID
-════════════════════════════════════ */
-function buildTeamGrid() {
-  const el = document.getElementById('teamGrid');
-  if (!el) return;
-  el.innerHTML = DATA.team.map(m => {
-    const initials = m.name.split(' ').map(w=>w[0]).join('').slice(0,2);
-    return `
-    <div class="team-card">
-      <div class="tm-avatar" style="background:${m.color}">${initials}</div>
-      <p class="tm-name">${m.name}</p>
-      <p class="tm-role">${m.role}</p>
-      <span class="tm-dept" style="background:${m.color}18;color:${m.color}">${m.dept}</span>
-      <div class="tm-meta">
-        <span><i class="fa-solid fa-diagram-project"></i> ${m.proj} Projects</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-/* ════════════════════════════════════
-   ECOSYSTEM GRID
-════════════════════════════════════ */
-function buildEcoGrid() {
-  const el = document.getElementById('ecoGrid');
-  if (!el) return;
-  el.innerHTML = DATA.ecosystem.map(eco => `
-    <div class="eco-card" onclick="showEcoDetails('${eco.id}')">
-      <div class="eco-card-top">
-        <div class="eco-icon ${eco.color}-wrap"><i class="fa-solid ${eco.icon}"></i></div>
-        <div class="eco-live ${eco.status === 'live' ? 'live' : 'maint'}">
-          <span class="pulse-dot ${eco.status === 'live' ? 'green' : 'yellow'}-pulse"></span>
-          ${eco.status === 'live' ? 'Live' : 'Maintenance'}
-        </div>
-      </div>
-      <p class="eco-name">${eco.name}</p>
-      <p class="eco-desc">${eco.desc}</p>
-      <div class="eco-stats">
-        <div class="es-item"><span class="es-val">${eco.patents}</span><span class="es-lbl">Patents</span></div>
-        <div class="es-item"><span class="es-val">${eco.uptime}%</span><span class="es-lbl">Uptime</span></div>
-        <div class="es-item"><span class="es-val">${eco.projects}</span><span class="es-lbl">Projects</span></div>
-      </div>
-      <div class="eco-bar"><div class="eb-fill ${eco.color}-fill" style="--p:${eco.uptime}%"></div></div>
-      <div class="eco-foot">
-        <div class="eco-tags"><span>${eco.tags}</span></div>
-        <i class="fa-solid fa-arrow-right"></i>
-      </div>
-    </div>
-  `).join('');
-  setTimeout(() => {
-    el.querySelectorAll('.eb-fill').forEach(b => b.style.width = 'var(--p)');
-  }, 300);
-}
-
-function showEcoDetails(id) {
-  const eco = DATA.ecosystem.find(e => e.id === id);
-  if (!eco) return;
-  openModal(`${eco.name} — Details`,
-    `<div style="display:flex;flex-direction:column;gap:14px">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;text-align:center">
-        <div style="padding:14px;background:var(--bg);border-radius:10px"><strong style="font-size:22px;display:block">${eco.patents}</strong><span style="font-size:12px;color:var(--text3)">Patents</span></div>
-        <div style="padding:14px;background:var(--bg);border-radius:10px"><strong style="font-size:22px;display:block">${eco.uptime}%</strong><span style="font-size:12px;color:var(--text3)">Uptime</span></div>
-        <div style="padding:14px;background:var(--bg);border-radius:10px"><strong style="font-size:22px;display:block">${eco.projects}</strong><span style="font-size:12px;color:var(--text3)">Projects</span></div>
-      </div>
-      <p style="font-size:14px;color:var(--text2);line-height:1.7">${eco.desc}</p>
-      <p style="font-size:12px;color:var(--text3)">Status: <strong style="color:var(--green)">${eco.status === 'live' ? 'Operational' : 'Under Maintenance'}</strong></p>
-    </div>`,
-    false
-  );
-}
-
-/* ════════════════════════════════════
-   PATENT CARDS
-════════════════════════════════════ */
-function buildPatentCards() {
-  const el = document.getElementById('patentCards');
-  if (!el) return;
-  el.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px';
-  el.innerHTML = DATA.patents.map(p => `
-    <div class="pat-card ${p.status}">
-      <div class="pc-hdr">
-        <span class="pc-id">${p.id}</span>
-        <span class="pc-sbadge ${p.status}">${p.status === 'granted' ? 'Granted' : 'Pending'}</span>
-      </div>
-      <div class="pc-icon"><i class="fa-solid ${getPatentIcon(p.id)}"></i></div>
-      <h4 class="pc-title">${p.title}</h4>
-      <p class="pc-desc">${p.desc}</p>
-      <div class="pc-foot">
-        <span><i class="fa-solid fa-calendar"></i> ${p.date}</span>
-        <button class="btn-link" onclick="showPatentDetails(${DATA.patents.indexOf(p)})">View Details →</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function getPatentIcon(id) {
-  const map = {'PAT-001':'fa-brain','PAT-002':'fa-network-wired','PAT-003':'fa-screwdriver-wrench','PAT-004':'fa-users-between-lines'};
-  return map[id] || 'fa-file-shield';
-}
-
-function showPatentDetails(idx) {
-  const p = DATA.patents[idx];
-  openModal(`Patent ${p.id} — Details`,
-    `<div style="display:flex;flex-direction:column;gap:14px">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text3)">${p.id}</span>
-        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:${p.status==='granted'?'var(--green-lt)':'var(--yellow-lt)'};color:${p.status==='granted'?'var(--green)':'var(--yellow)'}">${p.status === 'granted' ? 'Granted' : 'Pending'}</span>
-      </div>
-      <h4 style="font-size:16px;font-weight:800;color:var(--text)">${p.title}</h4>
-      <p style="font-size:13.5px;color:var(--text2);line-height:1.7">${p.desc}</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div style="padding:12px;background:var(--bg);border-radius:9px"><p style="font-size:11px;color:var(--text3)">Module</p><p style="font-size:13px;font-weight:700">${p.module}</p></div>
-        <div style="padding:12px;background:var(--bg);border-radius:9px"><p style="font-size:11px;color:var(--text3)">Filed / Granted</p><p style="font-size:13px;font-weight:700">${p.date}</p></div>
-      </div>
-    </div>`,
-    false
-  );
-}
-
-/* ════════════════════════════════════
+/* ────────────────────────────────────
    PROJECTS TABLE
-════════════════════════════════════ */
-function buildProjectsTable() {
-  filteredProjects = [...DATA.projects];
-  projPage = 1;
-  renderProjectsTable();
-}
-
-function filterProjects() {
-  const q      = (document.getElementById('projSearch')?.value || '').toLowerCase();
-  const status = document.getElementById('projStatusFilter')?.value || 'all';
-  const module = document.getElementById('projModuleFilter')?.value || 'all';
-
-  filteredProjects = DATA.projects.filter(p => {
-    const matchQ = !q || p.name.toLowerCase().includes(q) || p.module.toLowerCase().includes(q);
-    const matchS = status === 'all' || p.status === status;
-    const matchM = module === 'all' || p.module.includes(module);
-    return matchQ && matchS && matchM;
+──────────────────────────────────── */
+function getFilteredProjects() {
+  return DATA.projects.filter(p => {
+    const fMatch = state.projectFilter === 'all' || p.status === state.projectFilter;
+    const mMatch = state.moduleFilter === 'all' || p.module === state.moduleFilter;
+    const q = state.projectSearch.toLowerCase();
+    const sMatch = !q || p.name.toLowerCase().includes(q) || p.module.toLowerCase().includes(q) || p.id.toLowerCase().includes(q);
+    return fMatch && mMatch && sMatch;
+  }).sort((a, b) => {
+    const dir = state.sortDir === 'asc' ? 1 : -1;
+    const va = a[state.sortCol] ?? '', vb = b[state.sortCol] ?? '';
+    return typeof va === 'number' ? (va - vb) * dir : String(va).localeCompare(String(vb)) * dir;
   });
-  projPage = 1;
-  renderProjectsTable();
 }
 
-function sortTable(colIdx) {
-  if (sortConfig.col === colIdx) sortConfig.asc = !sortConfig.asc;
-  else { sortConfig.col = colIdx; sortConfig.asc = true; }
-
-  const keys = ['id','name','module','status','priority','progress'];
-  const key  = keys[colIdx];
-  filteredProjects.sort((a,b) => {
-    const av = a[key], bv = b[key];
-    if (typeof av === 'number') return sortConfig.asc ? av - bv : bv - av;
-    return sortConfig.asc ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
-  });
-  renderProjectsTable();
-}
-
-function renderProjectsTable() {
-  const tbody  = document.getElementById('projTbody');
-  const info   = document.getElementById('projInfo');
-  const pgDiv  = document.getElementById('projPagination');
-  const count  = document.getElementById('tcCount');
+function renderProjects() {
+  const all = getFilteredProjects();
+  const total = all.length;
+  const start = (state.page - 1) * state.rowsPerPage;
+  const paged = all.slice(start, start + state.rowsPerPage);
+  const tbody = $('#projectTbody');
   if (!tbody) return;
 
-  const total = filteredProjects.length;
-  const pages = Math.ceil(total / ROWS_PER_PAGE);
-  const start = (projPage - 1) * ROWS_PER_PAGE;
-  const slice = filteredProjects.slice(start, start + ROWS_PER_PAGE);
-
-  if (count) count.textContent = total;
-  if (info)  info.textContent  = `Showing ${start+1}–${Math.min(start+ROWS_PER_PAGE,total)} of ${total}`;
-
-  tbody.innerHTML = slice.map(p => {
-    const sc = p.status === 'Completed' ? 's-completed' : p.status === 'Ongoing' ? 's-ongoing' : 's-pending';
-    const pc = p.priority === 'High' ? 'p-high' : p.priority === 'Med' ? 'p-med' : 'p-low';
-    const pfClr = p.status === 'Completed' ? 'var(--green)' : p.status === 'Ongoing' ? 'var(--yellow)' : 'var(--red)';
-    return `
-    <tr>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)">${p.id}</td>
-      <td style="font-weight:600;color:var(--text)">${p.name}</td>
-      <td><span class="mod-tag"><i class="fa-solid ${moduleIcon(p.module)}"></i>${p.module}</span></td>
-      <td><span class="status-badge ${sc}">${p.status}</span></td>
-      <td><span class="pri-badge ${pc}">${p.priority}</span></td>
-      <td>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="progress-mini"><div class="pm-fill" style="width:${p.progress}%;background:${pfClr}"></div></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text2);min-width:28px">${p.progress}%</span>
-        </div>
-      </td>
-      <td>
-        <div class="action-btns">
-          <button class="act-btn edit" onclick="editProject('${p.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
-          <button class="act-btn del"  onclick="deleteProject('${p.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-
-  // Pagination
-  if (pgDiv) {
-    pgDiv.innerHTML = '';
-    for (let i = 1; i <= pages; i++) {
-      const btn = document.createElement('button');
-      btn.className = `pg-btn${i === projPage ? ' active' : ''}`;
-      btn.textContent = i;
-      btn.onclick = () => { projPage = i; renderProjectsTable(); };
-      pgDiv.appendChild(btn);
-    }
+  if (paged.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text3)"><i class="fa-solid fa-inbox" style="font-size:28px;display:block;margin-bottom:8px"></i>No projects found</td></tr>`;
+  } else {
+    tbody.innerHTML = paged.map(p => {
+      const sBadge = { ongoing: 's-ongoing', pending: 's-pending', completed: 's-completed' };
+      const pBadge = { high: 'p-high', medium: 'p-med', low: 'p-low' };
+      const statusLabel = { ongoing: '<i class="fa-solid fa-rotate fa-spin" style="font-size:10px"></i> Ongoing', pending: '<i class="fa-solid fa-clock" style="font-size:10px"></i> Pending', completed: '<i class="fa-solid fa-check" style="font-size:10px"></i> Completed' };
+      return `<tr>
+        <td style="font-weight:700;color:var(--text);font-size:12px">${p.id}</td>
+        <td><span style="font-weight:600;color:var(--text)">${p.name}</span></td>
+        <td><span style="font-size:12px;color:var(--text2)">${p.module}</span></td>
+        <td><span class="s-badge ${sBadge[p.status]}">${statusLabel[p.status]}</span></td>
+        <td><span class="p-badge ${pBadge[p.priority]}">${p.priority.charAt(0).toUpperCase() + p.priority.slice(1)}</span></td>
+        <td><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${p.progress}%"></div></div><span class="prog-num">${p.progress}%</span></div></td>
+        <td><div class="lead-av" style="background:#2563eb;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">${p.lead}</div></td>
+        <td><div class="tbl-act">
+          <button class="tbl-btn" title="View" onclick="viewProject('${p.id}')"><i class="fa-solid fa-eye"></i></button>
+          <button class="tbl-btn" title="Edit" onclick="editProject('${p.id}')"><i class="fa-solid fa-pen"></i></button>
+          <button class="tbl-btn del" title="Delete" onclick="deleteProject('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+        </div></td>
+      </tr>`;
+    }).join('');
   }
+
+  const end = Math.min(start + state.rowsPerPage, total);
+  $('#tableInfo').textContent = `Showing ${total > 0 ? start + 1 : 0}–${end} of ${total} projects`;
+  renderPagination(total);
 }
 
-function moduleIcon(mod) {
-  const map = {'AI Hub':'fa-brain','Web Services':'fa-globe','Tools':'fa-screwdriver-wrench','Community':'fa-users-between-lines'};
-  return map[mod] || 'fa-cube';
+function renderPagination(total) {
+  const pages = Math.ceil(total / state.rowsPerPage);
+  const pg = $('#pagination');
+  if (!pg) return;
+  let html = '';
+  if (state.page > 1) html += `<button class="pg-btn" onclick="goPage(${state.page - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+  for (let i = 1; i <= pages; i++) {
+    html += `<button class="pg-btn${state.page === i ? ' active' : ''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  if (state.page < pages) html += `<button class="pg-btn" onclick="goPage(${state.page + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+  pg.innerHTML = html;
 }
 
-function editProject(id) {
+function goPage(p) { state.page = p; renderProjects(); }
+
+$$('.fpill').forEach(btn => {
+  btn.addEventListener('click', function () {
+    $$('.fpill').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    state.projectFilter = this.dataset.filter;
+    state.page = 1;
+    renderProjects();
+  });
+});
+
+$('#moduleFilter')?.addEventListener('change', function () { state.moduleFilter = this.value; state.page = 1; renderProjects(); });
+$('#projectSearch')?.addEventListener('input', function () { state.projectSearch = this.value; state.page = 1; renderProjects(); });
+
+$$('.th-sort').forEach(th => {
+  th.addEventListener('click', function () {
+    const col = this.dataset.col;
+    if (state.sortCol === col) state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+    else { state.sortCol = col; state.sortDir = 'asc'; }
+    $$('.th-sort i').forEach(i => { i.className = 'fa-solid fa-sort'; i.style.opacity = '.4'; });
+    const icon = this.querySelector('i');
+    icon.className = `fa-solid fa-sort-${state.sortDir === 'asc' ? 'up' : 'down'}`;
+    icon.style.opacity = '1';
+    renderProjects();
+  });
+});
+
+window.viewProject = function (id) {
   const p = DATA.projects.find(x => x.id === id);
   if (!p) return;
-  openModal(`Edit Project ${p.id}`,
-    `<div class="form-group"><label class="form-label">Project Name</label><input class="form-input" id="ep-name" value="${p.name}"/></div>
-     <div class="form-grid">
-       <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="ep-status"><option ${p.status==='Ongoing'?'selected':''}>Ongoing</option><option ${p.status==='Pending'?'selected':''}>Pending</option><option ${p.status==='Completed'?'selected':''}>Completed</option></select></div>
-       <div class="form-group"><label class="form-label">Priority</label><select class="form-select" id="ep-priority"><option value="High" ${p.priority==='High'?'selected':''}>High</option><option value="Med" ${p.priority==='Med'?'selected':''}>Medium</option><option value="Low" ${p.priority==='Low'?'selected':''}>Low</option></select></div>
-     </div>
-     <div class="form-group"><label class="form-label">Progress (${p.progress}%)</label><input type="range" class="sett-input" id="ep-progress" min="0" max="100" value="${p.progress}" oninput="this.previousElementSibling.textContent='Progress ('+this.value+'%)'"/></div>`,
-    true,
-    () => {
-      p.name     = document.getElementById('ep-name').value;
-      p.status   = document.getElementById('ep-status').value;
-      p.priority = document.getElementById('ep-priority').value;
-      p.progress = parseInt(document.getElementById('ep-progress').value);
-      renderProjectsTable();
-      showToast(`Project ${p.id} updated successfully`, 'success');
-    }
-  );
-}
+  showModal('Project Details', `
+    <div class="form-group"><label>Project ID</label><input value="${p.id}" readonly/></div>
+    <div class="form-group"><label>Name</label><input value="${p.name}" readonly/></div>
+    <div class="form-group"><label>Module</label><input value="${p.module}" readonly/></div>
+    <div class="form-group"><label>Status</label><input value="${p.status}" readonly/></div>
+    <div class="form-group"><label>Priority</label><input value="${p.priority}" readonly/></div>
+    <div class="form-group"><label>Progress</label><input value="${p.progress}%" readonly/></div>
+  `, null);
+};
 
-function deleteProject(id) {
-  openModal('Confirm Delete',
-    `<p>Are you sure you want to delete project <strong>${id}</strong>? This action cannot be undone.</p>`,
-    true,
-    () => {
-      const idx = DATA.projects.findIndex(x => x.id === id);
-      if (idx > -1) DATA.projects.splice(idx, 1);
-      buildProjectsTable();
-      showToast(`Project ${id} deleted`, 'error');
-    }
-  );
-}
-
-function showAddProjectModal() {
-  openModal('Add New Project',
-    `<div class="form-group"><label class="form-label">Project Name</label><input class="form-input" id="np-name" placeholder="Enter project name..."/></div>
-     <div class="form-grid">
-       <div class="form-group"><label class="form-label">Module</label><select class="form-select" id="np-module"><option>AI Hub</option><option>Web Services</option><option>Tools</option><option>Community</option></select></div>
-       <div class="form-group"><label class="form-label">Priority</label><select class="form-select" id="np-priority"><option value="High">High</option><option value="Med">Medium</option><option value="Low">Low</option></select></div>
-     </div>
-     <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="np-desc" placeholder="Brief project description..."></textarea></div>`,
-    true,
-    () => {
-      const name = document.getElementById('np-name').value.trim();
-      if (!name) { showToast('Please enter a project name','error'); return; }
-      const newId = String(DATA.projects.length + 1).padStart(3,'0');
-      DATA.projects.push({ id:newId, name, module:document.getElementById('np-module').value, status:'Pending', priority:document.getElementById('np-priority').value, progress:0 });
-      buildProjectsTable();
-      showToast(`Project ${newId} added successfully!`, 'success');
-    }
-  );
-}
-
-/* ════════════════════════════════════
-   PATENT MODAL
-════════════════════════════════════ */
-function showAddPatentModal() {
-  openModal('File New Patent',
-    `<div class="form-group"><label class="form-label">Patent Title</label><input class="form-input" id="npa-title" placeholder="Enter patent title..."/></div>
-     <div class="form-grid">
-       <div class="form-group"><label class="form-label">Module</label><select class="form-select" id="npa-module"><option>AI Hub</option><option>Web Services</option><option>Tools</option><option>Community</option></select></div>
-       <div class="form-group"><label class="form-label">Filing Date</label><input type="date" class="form-input" id="npa-date"/></div>
-     </div>
-     <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="npa-desc" placeholder="Detailed patent description..."></textarea></div>`,
-    true,
-    () => {
-      const title = document.getElementById('npa-title').value.trim();
-      if (!title) { showToast('Please enter a patent title','error'); return; }
-      const newId = `PAT-00${DATA.patents.length+1}`;
-      DATA.patents.push({ id:newId, title, module:document.getElementById('npa-module').value, status:'pending', date:'Pending', desc:document.getElementById('npa-desc').value });
-      buildPatentCards();
-      showToast(`Patent ${newId} filed for review!`, 'success');
-    }
-  );
-}
-
-/* ════════════════════════════════════
-   SETTINGS
-════════════════════════════════════ */
-function buildSettingsPage() {
-  document.querySelectorAll('.stab').forEach(tab => {
-    tab.addEventListener('click', function () {
-      document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
-      this.classList.add('active');
-      renderSettings(this.dataset.tab);
-    });
+window.editProject = function (id) {
+  const p = DATA.projects.find(x => x.id === id);
+  if (!p) return;
+  showModal('Edit Project', `
+    <div class="form-group"><label>Project Name</label><input id="ep_name" value="${p.name}"/></div>
+    <div class="form-group"><label>Module</label>
+      <select id="ep_module">
+        ${['XBzin AI Hub', 'XBzin Web Services', 'XBzin Tools', 'XBzin Community'].map(m => `<option${p.module === m ? ' selected' : ''}>${m}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Status</label>
+      <select id="ep_status">
+        ${['ongoing', 'pending', 'completed'].map(s => `<option${p.status === s ? ' selected' : ''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Priority</label>
+      <select id="ep_priority">
+        ${['high', 'medium', 'low'].map(s => `<option${p.priority === s ? ' selected' : ''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Progress (%)</label><input type="number" id="ep_progress" value="${p.progress}" min="0" max="100"/></div>
+  `, () => {
+    p.name = $('#ep_name').value;
+    p.module = $('#ep_module').value;
+    p.status = $('#ep_status').value;
+    p.priority = $('#ep_priority').value;
+    p.progress = parseInt($('#ep_progress').value) || 0;
+    renderProjects();
+    showToast(`Project "${p.name}" updated!`, 'success');
+    addActivity('info', 'fa-pen', `Project ${p.id} updated`, 'Projects · Admin', 'just now');
   });
-}
+};
 
-function renderSettings(tab) {
-  const body = document.getElementById('settingsBody');
-  if (!body) return;
-  const s = DATA.settings;
+window.deleteProject = function (id) {
+  const p = DATA.projects.find(x => x.id === id);
+  if (!p) return;
+  showModal('Delete Project', `
+    <div style="text-align:center;padding:10px 0">
+      <i class="fa-solid fa-triangle-exclamation" style="font-size:40px;color:var(--red);margin-bottom:12px;display:block"></i>
+      <p style="font-size:14px;color:var(--text);margin-bottom:6px">Are you sure you want to delete</p>
+      <p style="font-weight:700;color:var(--text)">"${p.name}"?</p>
+      <p style="font-size:12px;color:var(--text3);margin-top:8px">This action cannot be undone.</p>
+    </div>
+  `, () => {
+    const idx = DATA.projects.indexOf(p);
+    DATA.projects.splice(idx, 1);
+    renderProjects();
+    showToast(`Project "${p.name}" deleted`, 'error');
+    addActivity('error', 'fa-trash', `Project ${p.id} deleted`, 'Projects · Admin', 'just now');
+  });
+};
 
-  const templates = {
-    general: `
-      <div class="sett-section">
-        <h3 class="sett-title">Personal Information</h3>
-        <p class="sett-desc">Update your personal details and contact information.</p>
-        <div class="form-group"><label class="form-label">Full Name</label><input class="sett-input" id="s-name" value="${s.name}"/></div>
-        <div class="form-grid">
-          <div class="form-group"><label class="form-label">Email Address</label><input class="sett-input" id="s-email" value="${s.email}"/></div>
-          <div class="form-group"><label class="form-label">Phone Number</label><input class="sett-input" id="s-phone" value="${s.phone}"/></div>
-        </div>
-        <div class="sett-actions">
-          <button class="btn b-primary" onclick="saveGeneralSettings()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
-          <button class="btn b-ghost" onclick="showToast('Changes discarded','info')">Discard</button>
-        </div>
-      </div>`,
+$('#addProjectBtn')?.addEventListener('click', () => {
+  showModal('Add New Project', `
+    <div class="form-group"><label>Project Name *</label><input id="np_name" placeholder="Enter project name"/></div>
+    <div class="form-group"><label>Module *</label>
+      <select id="np_module"><option>XBzin AI Hub</option><option>XBzin Web Services</option><option>XBzin Tools</option><option>XBzin Community</option></select>
+    </div>
+    <div class="form-group"><label>Status</label>
+      <select id="np_status"><option value="pending">Pending</option><option value="ongoing">Ongoing</option></select>
+    </div>
+    <div class="form-group"><label>Priority</label>
+      <select id="np_priority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select>
+    </div>
+    <div class="form-group"><label>Lead (initials)</label><input id="np_lead" placeholder="e.g. BS" maxlength="3"/></div>
+  `, () => {
+    const name = $('#np_name').value.trim();
+    if (!name) { showToast('Project name is required!', 'warning'); return false; }
+    const newId = `P-${String(DATA.projects.length + 1).padStart(3, '0')}`;
+    DATA.projects.unshift({ id: newId, name, module: $('#np_module').value, status: $('#np_status').value, priority: $('#np_priority').value, progress: 0, lead: $('#np_lead').value || 'BS' });
+    state.page = 1;
+    renderProjects();
+    showToast(`Project "${name}" added!`, 'success');
+    addActivity('success', 'fa-plus', `New project "${name}" created`, 'Projects · Admin', 'just now');
+  });
+});
 
-    appearance: `
-      <div class="sett-section">
-        <h3 class="sett-title">Theme & Display</h3>
-        <p class="sett-desc">Customize how the dashboard looks and feels.</p>
-        <div class="sett-row">
-          <div><p class="sett-row-label">Dark Mode</p><p class="sett-row-sub">Toggle between light and dark theme</p></div>
-          <label class="toggle-switch"><input type="checkbox" ${document.documentElement.getAttribute('data-theme')==='dark'?'checked':''} onchange="toggleTheme()"/><div class="toggle-track"></div></label>
-        </div>
-        <div class="sett-row">
-          <div><p class="sett-row-label">Compact View</p><p class="sett-row-sub">Reduce spacing for more data density</p></div>
-          <label class="toggle-switch"><input type="checkbox" ${s.compactView?'checked':''} onchange="DATA.settings.compactView=this.checked;showToast('Compact view '+( this.checked?'enabled':'disabled'),'info')"/><div class="toggle-track"></div></label>
-        </div>
-        <div class="sett-row">
-          <div><p class="sett-row-label">Auto Refresh</p><p class="sett-row-sub">Automatically refresh data every 30 seconds</p></div>
-          <label class="toggle-switch"><input type="checkbox" ${s.autoRefresh?'checked':''} onchange="DATA.settings.autoRefresh=this.checked;showToast('Auto refresh '+( this.checked?'enabled':'disabled'),'info')"/><div class="toggle-track"></div></label>
-        </div>
-      </div>`,
-
-    notifications: `
-      <div class="sett-section">
-        <h3 class="sett-title">Notification Preferences</h3>
-        <p class="sett-desc">Control which notifications you receive and how.</p>
-        <div class="sett-row">
-          <div><p class="sett-row-label">Push Notifications</p><p class="sett-row-sub">In-dashboard alerts and updates</p></div>
-          <label class="toggle-switch"><input type="checkbox" ${s.notifications?'checked':''} onchange="DATA.settings.notifications=this.checked;showToast('Push notifications '+( this.checked?'enabled':'disabled'),'info')"/><div class="toggle-track"></div></label>
-        </div>
-        <div class="sett-row">
-          <div><p class="sett-row-label">Email Alerts</p><p class="sett-row-sub">Receive important updates via email</p></div>
-          <label class="toggle-switch"><input type="checkbox" ${s.emailAlerts?'checked':''} onchange="DATA.settings.emailAlerts=this.checked;showToast('Email alerts '+( this.checked?'enabled':'disabled'),'info')"/><div class="toggle-track"></div></label>
-        </div>
-        <div class="sett-row">
-          <div><p class="sett-row-label">Project Updates</p><p class="sett-row-sub">Notifications when project status changes</p></div>
-          <label class="toggle-switch"><input type="checkbox" ${s.projectUpdates?'checked':''} onchange="DATA.settings.projectUpdates=this.checked;showToast('Project updates '+( this.checked?'enabled':'disabled'),'info')"/><div class="toggle-track"></div></label>
-        </div>
-      </div>`,
-
-    security: `
-      <div class="sett-section">
-        <h3 class="sett-title">Security Settings</h3>
-        <p class="sett-desc">Manage your account security and access controls.</p>
-        <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="sett-input" placeholder="Enter current password"/></div>
-        <div class="form-grid">
-          <div class="form-group"><label class="form-label">New Password</label><input type="password" class="sett-input" placeholder="New password"/></div>
-          <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" class="sett-input" placeholder="Confirm new password"/></div>
-        </div>
-        <div class="sett-actions">
-          <button class="btn b-primary" onclick="showToast('Password updated successfully!','success')"><i class="fa-solid fa-lock"></i> Update Password</button>
-        </div>
-        <hr style="border:none;border-top:1px solid var(--border);margin:24px 0"/>
-        <div class="sett-row">
-          <div><p class="sett-row-label">Two-Factor Authentication</p><p class="sett-row-sub">Add an extra layer of security</p></div>
-          <label class="toggle-switch"><input type="checkbox" onchange="showToast('2FA '+( this.checked?'enabled':'disabled'),'success')"/><div class="toggle-track"></div></label>
-        </div>
-        <div class="sett-row">
-          <div><p class="sett-row-label">Session Timeout</p><p class="sett-row-sub">Auto logout after 30 minutes of inactivity</p></div>
-          <label class="toggle-switch"><input type="checkbox" checked onchange="showToast('Session timeout '+( this.checked?'enabled':'disabled'),'info')"/><div class="toggle-track"></div></label>
-        </div>
-      </div>`,
-  };
-  body.innerHTML = templates[tab] || '';
-}
-
-function saveGeneralSettings() {
-  DATA.settings.name  = document.getElementById('s-name')?.value  || DATA.settings.name;
-  DATA.settings.email = document.getElementById('s-email')?.value || DATA.settings.email;
-  DATA.settings.phone = document.getElementById('s-phone')?.value || DATA.settings.phone;
-  showToast('Settings saved successfully!', 'success');
-}
-
-/* ════════════════════════════════════
-   THEME TOGGLE
-════════════════════════════════════ */
-function toggleTheme() {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('themeIco').className = isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
-  DATA.settings.darkMode = !isDark;
-  showToast(`${isDark ? 'Light' : 'Dark'} mode activated`, 'info');
-}
-
-/* ════════════════════════════════════
-   EXPORT & ACTIONS
-════════════════════════════════════ */
-function exportReport() {
-  showToast('Generating PDF report...', 'info');
-  setTimeout(() => showToast('Report ready! (Demo mode — no actual download)', 'success'), 1500);
-}
-
-function downloadReport(name) {
-  showToast(`Generating "${name}"...`, 'info');
-  setTimeout(() => showToast(`"${name}" ready! (Demo mode)`, 'success'), 1500);
-}
-
-function exportTableCSV() {
-  const headers = ['ID','Project Name','Module','Status','Priority','Progress'];
-  const rows = filteredProjects.map(p => [p.id, `"${p.name}"`, p.module, p.status, p.priority, p.progress+'%']);
-  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+$('#exportProjectsBtn')?.addEventListener('click', () => {
+  const rows = [['ID', 'Name', 'Module', 'Status', 'Priority', 'Progress', 'Lead']];
+  DATA.projects.forEach(p => rows.push([p.id, p.name, p.module, p.status, p.priority, p.progress + '%', p.lead]));
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'xbzin_projects.csv';
-  a.click();
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `xbzin-projects-${Date.now()}.csv`;
+  link.click();
   showToast('Projects exported as CSV!', 'success');
-}
+});
 
-function downloadAllData() {
-  const data = JSON.stringify({ projects: DATA.projects, patents: DATA.patents, team: DATA.team }, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'xbzin_dashboard_data.json';
-  a.click();
-  showToast('All data exported as JSON!', 'success');
-}
-
-function refreshDashboard() {
-  showToast('Refreshing dashboard data...', 'info');
-  setTimeout(() => {
-    initKPICounters();
-    showToast('Dashboard refreshed successfully!', 'success');
-  }, 800);
-}
-
-function handleLogout() {
-  openModal('Confirm Logout',
-    '<p>Are you sure you want to logout from the XBzin Admin Dashboard?</p>',
-    true,
-    () => {
-      showToast('Logging out...', 'info');
-      setTimeout(() => location.reload(), 1000);
-    }
-  );
-}
-
-/* ════════════════════════════════════
+/* ────────────────────────────────────
    MODAL SYSTEM
-════════════════════════════════════ */
-function openModal(title, bodyHtml, showConfirm = true, onConfirm = null) {
-  document.getElementById('mTitle').textContent = title;
-  document.getElementById('mBody').innerHTML = bodyHtml;
-  document.getElementById('mFooter').style.display = showConfirm ? 'flex' : 'none';
-  document.getElementById('modalBg').classList.add('open');
-
-  document.getElementById('mConfirm').onclick = () => {
-    if (onConfirm) onConfirm();
-    closeModal();
-  };
+──────────────────────────────────── */
+function showModal(title, bodyHtml, onSubmit) {
+  $('#modalTitle').textContent = title;
+  $('#modalBody').innerHTML = bodyHtml;
+  const backdrop = $('#modalBackdrop');
+  backdrop.classList.remove('hidden');
+  const submitBtn = $('#modalSubmit');
+  if (onSubmit === null) submitBtn.style.display = 'none';
+  else { submitBtn.style.display = ''; submitBtn.onclick = () => { if (onSubmit() !== false) closeModal(); }; }
 }
-
 function closeModal() {
-  document.getElementById('modalBg').classList.remove('open');
+  $('#modalBackdrop').classList.add('hidden');
+  $('#modalSubmit').style.display = '';
+}
+$('#modalClose')?.addEventListener('click', closeModal);
+$('#modalCancel')?.addEventListener('click', closeModal);
+$('#modalBackdrop')?.addEventListener('click', (e) => { if (e.target === $('#modalBackdrop')) closeModal(); });
+
+/* ────────────────────────────────────
+   TEAM GRID
+──────────────────────────────────── */
+function renderTeam() {
+  const grid = $('#teamGrid');
+  if (!grid) return;
+  grid.innerHTML = DATA.team.map(m => `
+    <div class="team-card">
+      <div class="tc-avatar" style="background:${m.color}">${m.initials}</div>
+      <p class="tc-name">${m.name}</p>
+      <p class="tc-role">${m.role}</p>
+      <span class="tc-module">${m.module}</span>
+    </div>
+  `).join('');
 }
 
-document.getElementById('mClose').addEventListener('click', closeModal);
-document.getElementById('mCancel').addEventListener('click', closeModal);
-document.getElementById('modalBg').addEventListener('click', e => { if (e.target === document.getElementById('modalBg')) closeModal(); });
-
-/* ════════════════════════════════════
-   TOAST SYSTEM
-════════════════════════════════════ */
-function showToast(msg, type = 'info') {
-  const icons = { success:'fa-circle-check', error:'fa-circle-xmark', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
-  const stack = document.getElementById('toastStack');
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.innerHTML = `
-    <div class="toast-ico ${type}"><i class="fa-solid ${icons[type]}"></i></div>
-    <span class="toast-msg">${msg}</span>
-    <button class="toast-cls" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
-  stack.appendChild(toast);
-  setTimeout(() => {
-    toast.classList.add('hiding');
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
+/* ────────────────────────────────────
+   PATENT CARDS
+──────────────────────────────────── */
+function renderPatents() {
+  const grid = $('#patentGrid');
+  if (!grid) return;
+  grid.innerHTML = DATA.patents.map(p => `
+    <div class="patent-pro-card ${p.status === 'granted' ? 'patent-granted' : 'patent-pending'}">
+      <div class="ppc-header">
+        <div class="ppc-num">${p.id}</div>
+        <span class="${p.status === 'granted' ? 'ppc-badge-granted' : 'ppc-badge-pending'}">${p.status === 'granted' ? 'Granted' : 'Pending'}</span>
+      </div>
+      <div class="ppc-icon-area"><i class="fa-solid ${p.icon}" style="font-size:32px;color:var(--g300)"></i></div>
+      <h3 class="ppc-title">${p.title}</h3>
+      <p class="ppc-desc">${p.desc}</p>
+      <div class="ppc-tags">${p.tags.map(t => `<span class="ppc-tag">${t}</span>`).join('')}</div>
+      <div class="ppc-footer">
+        <span><i class="fa-solid fa-calendar-${p.status === 'granted' ? 'check' : 'clock'}"></i> ${p.status === 'granted' ? 'Granted' : 'Filed'} ${p.date}</span>
+        <button class="ppc-view-btn" onclick="showToast('${p.title} details opened','info')">${p.status === 'granted' ? 'View Details' : 'Track Status'}</button>
+      </div>
+    </div>
+  `).join('');
 }
 
-/* ════════════════════════════════════
-   HELPERS
-════════════════════════════════════ */
-function getLast(n, type) {
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const now = new Date();
-  return Array.from({length: n}, (_,i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() - (n-1-i), 1);
-    return months[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2);
+/* ────────────────────────────────────
+   ECOSYSTEM MODULES
+──────────────────────────────────── */
+function renderEcosystem() {
+  const grid = $('#ecoGrid');
+  if (!grid) return;
+  grid.innerHTML = DATA.ecosystem.map(m => `
+    <div class="eco-module-card">
+      <div class="emc-status-bar active"></div>
+      <div class="emc-top">
+        <div class="emc-icon ${m.iconBg}"><i class="fa-solid ${m.icon}"></i></div>
+        <div class="emc-live"><span class="emc-live-dot"></span>Live</div>
+      </div>
+      <h3 class="emc-name">${m.name}</h3>
+      <p class="emc-desc">${m.desc}</p>
+      <div class="emc-stats">
+        <div class="emc-stat"><p class="emc-sval">${m.patents}</p><p class="emc-slbl">Patents</p></div>
+        <div class="emc-stat"><p class="emc-sval">${m.projects}</p><p class="emc-slbl">Projects</p></div>
+        <div class="emc-stat"><p class="emc-sval">${m.members}</p><p class="emc-slbl">Members</p></div>
+      </div>
+      <div class="emc-health-row">
+        <div class="emc-health-bar"><div class="emc-health-fill ${m.fillClass}" style="width:${m.health}%"></div></div>
+        <span class="emc-health-pct">${m.health}%</span>
+      </div>
+      <div class="emc-footer">
+        <div class="emc-tags">${m.tags.map(t => `<span class="emc-tag">${t}</span>`).join('')}</div>
+        <button class="emc-details-btn" onclick="showToast('${m.name} details panel coming soon!','info')">Details <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ────────────────────────────────────
+   ACTIVITY LOG
+──────────────────────────────────── */
+function addActivity(type, icon, title, meta, time = 'just now') {
+  DATA.activities.unshift({ type, icon, title, meta, time });
+  renderActivity();
+}
+
+function renderActivity() {
+  const feed = $('#activityFeed');
+  if (!feed) return;
+  const colors = { success: 'green-icon-bg', info: 'blue-icon-bg', warning: 'yellow-icon-bg', error: 'red-icon-bg' };
+  feed.innerHTML = DATA.activities.map(a => `
+    <div class="af-item">
+      <div class="af-icon ${colors[a.type] || 'blue-icon-bg'}"><i class="fa-solid ${a.icon}"></i></div>
+      <div class="af-body">
+        <p class="af-title">${a.title}</p>
+        <p class="af-meta"><i class="fa-solid fa-circle" style="font-size:5px"></i> ${a.meta}</p>
+      </div>
+      <span class="af-time">${a.time}</span>
+    </div>
+  `).join('');
+}
+
+$('#clearActivityBtn')?.addEventListener('click', () => {
+  DATA.activities = [];
+  renderActivity();
+  showToast('Activity log cleared', 'info');
+});
+
+$('#addActivityBtn')?.addEventListener('click', () => {
+  showModal('Add Activity Event', `
+    <div class="form-group"><label>Event Title *</label><input id="ae_title" placeholder="e.g. Project milestone reached"/></div>
+    <div class="form-group"><label>Module / Category</label><input id="ae_meta" placeholder="e.g. Projects · Admin"/></div>
+    <div class="form-group"><label>Type</label>
+      <select id="ae_type"><option value="success">Success</option><option value="info">Info</option><option value="warning">Warning</option><option value="error">Error</option></select>
+    </div>
+  `, () => {
+    const title = $('#ae_title').value.trim();
+    if (!title) { showToast('Event title required!', 'warning'); return false; }
+    const icons = { success: 'fa-circle-check', info: 'fa-circle-info', warning: 'fa-triangle-exclamation', error: 'fa-circle-xmark' };
+    const type = $('#ae_type').value;
+    addActivity(type, icons[type], title, $('#ae_meta').value || 'General', 'just now');
+    showToast('Activity event added!', 'success');
   });
+});
+
+/* ────────────────────────────────────
+   ADD PATENT
+──────────────────────────────────── */
+$('#addPatentBtn')?.addEventListener('click', () => {
+  showModal('File New Patent', `
+    <div class="form-group"><label>Patent Title *</label><input id="np_title" placeholder="Enter patent title"/></div>
+    <div class="form-group"><label>Description</label><textarea id="np_desc" rows="3" placeholder="Brief description of the invention..."></textarea></div>
+    <div class="form-group"><label>Module</label>
+      <select id="np_module"><option>XBzin AI Hub</option><option>XBzin Web Services</option><option>XBzin Tools</option><option>XBzin Community</option></select>
+    </div>
+  `, () => {
+    const title = $('#np_title').value.trim();
+    if (!title) { showToast('Patent title required!', 'warning'); return false; }
+    const newId = `PAT-00${DATA.patents.length + 1}`;
+    DATA.patents.push({ id: newId, title, desc: $('#np_desc').value || 'Patent description pending.', tags: [$('#np_module').value], status: 'pending', icon: 'fa-file-shield', date: 'FY 2024-25' });
+    renderPatents();
+    showToast(`Patent "${title}" filed successfully!`, 'success');
+    addActivity('info', 'fa-file-shield', `New patent "${title}" filed`, 'Legal · Patents', 'just now');
+  });
+});
+
+/* ────────────────────────────────────
+   CHART REFRESH
+──────────────────────────────────── */
+$('#refreshCharts')?.addEventListener('click', () => {
+  const btn = $('#refreshCharts');
+  btn.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> Refreshing...';
+  setTimeout(() => {
+    initAllCharts();
+    btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Refresh';
+    showToast('Charts refreshed!', 'success', 2000);
+  }, 800);
+});
+
+/* ────────────────────────────────────
+   AUTO REFRESH
+──────────────────────────────────── */
+$('#autoRefreshToggle')?.addEventListener('change', function () {
+  if (this.checked) {
+    state.autoRefreshInterval = setInterval(() => { initAllCharts(); }, 30000);
+    showToast('Auto-refresh enabled (30s)', 'info', 2000);
+  } else {
+    clearInterval(state.autoRefreshInterval);
+    showToast('Auto-refresh disabled', 'info', 2000);
+  }
+});
+
+/* ────────────────────────────────────
+   EXPORT FULL REPORT
+──────────────────────────────────── */
+$('#exportBtn')?.addEventListener('click', () => exportReport());
+$('#exportAllBtn')?.addEventListener('click', () => exportReport());
+
+function exportReport() {
+  const rows = [['XBzin Ecosystem Admin Report'], ['Generated:', new Date().toLocaleString()], [],
+    ['=== KPI SUMMARY ==='], ['Metric', 'Value'],
+    ['Total Employees', 16], ['Projects Completed', 129], ['Ongoing Projects', 4],
+    ['Pending Projects', 9], ['Company Valuation', '₹1,00,00,000'],
+    ['Total Investment', '₹43,00,000'], ['Fund Utilized', '₹78,00,000'],
+    ['Total Patents', 4], ['Granted Patents', 3], ['Pending Patents', 1], [],
+    ['=== PROJECTS ==='], ['ID', 'Name', 'Module', 'Status', 'Priority', 'Progress'],
+    ...DATA.projects.map(p => [p.id, p.name, p.module, p.status, p.priority, p.progress + '%']), [],
+    ['=== TEAM ==='], ['Name', 'Role', 'Module'],
+    ...DATA.team.map(m => [m.name, m.role, m.module]),
+  ];
+  const csv = rows.map(r => Array.isArray(r) ? r.map(c => `"${c}"`).join(',') : `"${r}"`).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `xbzin-full-report-${Date.now()}.csv`;
+  link.click();
+  showToast('Full report exported!', 'success');
+  addActivity('success', 'fa-file-export', 'Full report exported as CSV', 'Reports · Admin', 'just now');
 }
 
-function genData(n, min, max) {
-  return Array.from({length: n}, () => Math.floor(Math.random() * (max - min + 1)) + min);
+/* ────────────────────────────────────
+   SETTINGS
+──────────────────────────────────── */
+$('#animToggle')?.addEventListener('change', function () {
+  document.documentElement.style.setProperty('--t', this.checked ? '180ms ease' : '0ms');
+  showToast(this.checked ? 'Animations enabled' : 'Animations disabled', 'info', 2000);
+});
+$('#resetBtn')?.addEventListener('click', () => {
+  showModal('Reset Dashboard', `
+    <div style="text-align:center;padding:10px 0">
+      <i class="fa-solid fa-rotate-left" style="font-size:40px;color:var(--yellow);margin-bottom:12px;display:block"></i>
+      <p style="font-size:14px;color:var(--text);margin-bottom:6px">Reset all dashboard settings to default?</p>
+      <p style="font-size:12px;color:var(--text3)">This will revert theme, sidebar, and filters.</p>
+    </div>
+  `, () => {
+    setTheme(false);
+    if (state.sidebarCollapsed) toggleCollapse();
+    state.projectFilter = 'all';
+    state.moduleFilter = 'all';
+    state.projectSearch = '';
+    state.page = 1;
+    $$('.fpill').forEach((b, i) => i === 0 ? b.classList.add('active') : b.classList.remove('active'));
+    $('#moduleFilter').value = 'all';
+    $('#projectSearch').value = '';
+    renderProjects();
+    showToast('Dashboard reset to defaults', 'success');
+    addActivity('info', 'fa-rotate-left', 'Dashboard settings reset', 'System · Settings', 'just now');
+  });
+});
+
+/* ────────────────────────────────────
+   INITIAL LOAD
+──────────────────────────────────── */
+async function init() {
+  await runLoadingScreen();
+  initAllCharts();
+  initSparklines();
+  renderProjects();
+  renderTeam();
+  renderPatents();
+  renderEcosystem();
+  renderActivity();
+  // Set initial KPI static values for non-counter items
+  $$('.kc-val').forEach(el => {
+    if (!el.dataset.target && el.textContent.trim() === '0') {
+      if (el.closest('.kc-red') && el.closest('.kc-red').querySelector('.kc-label')?.textContent.includes('Fund')) el.textContent = '₹78L';
+      else if (el.closest('.kc-green') && el.closest('.kc-green').querySelector('.kc-label')?.textContent.includes('Investment')) el.textContent = '₹43L';
+    }
+  });
+  updateNotifBadge();
 }
 
-/* ════════════════════════════════════
-   BOOT
-════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', initLoader);
+init();

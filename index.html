@@ -4,537 +4,671 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>XBzin Ecosystem — Admin Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-<!-- ══════════ LOADING SCREEN ══════════ -->
-<div class="loader-screen" id="loaderScreen">
-  <div class="loader-inner">
-    <div class="loader-logo-wrap">
-      <div class="ll-icon"><i class="fa-solid fa-hexagon-nodes"></i></div>
-      <div class="ll-name">XBzin</div>
-    </div>
-    <div class="loader-progress"><div class="lp-fill" id="lpFill"></div></div>
-    <p class="loader-status" id="loaderStatus">Initializing ecosystem...</p>
+<!-- LOADING SCREEN -->
+<div id="loadingScreen" class="loading-screen">
+  <div class="loading-inner">
+    <div class="loading-logo"><i class="fa-solid fa-hexagon-nodes"></i><span>XBzin</span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-fill" id="loadFill"></div></div>
+    <p class="loading-text" id="loadText">Initializing Dashboard...</p>
   </div>
 </div>
 
-<!-- ══════════ TOAST STACK ══════════ -->
-<div class="toast-stack" id="toastStack"></div>
+<!-- COMMAND PALETTE -->
+<div id="cmdPalette" class="cmd-palette hidden">
+  <div class="cmd-backdrop" id="cmdBackdrop"></div>
+  <div class="cmd-box">
+    <div class="cmd-search-row">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="cmdInput" placeholder="Search sections, metrics, projects..." autocomplete="off"/>
+      <kbd>ESC</kbd>
+    </div>
+    <div class="cmd-results" id="cmdResults"></div>
+    <div class="cmd-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> open</span>
+      <span><kbd>ESC</kbd> close</span>
+    </div>
+  </div>
+</div>
 
-<!-- ══════════ MODAL ══════════ -->
-<div class="modal-bg" id="modalBg">
+<!-- TOAST CONTAINER -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- MODAL BACKDROP -->
+<div class="modal-backdrop hidden" id="modalBackdrop">
   <div class="modal-box" id="modalBox">
-    <div class="modal-hdr">
-      <h3 id="mTitle">Dialog</h3>
-      <button class="modal-cls" id="mClose"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-header">
+      <h3 id="modalTitle">Modal</h3>
+      <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div class="modal-bdy" id="mBody"></div>
-    <div class="modal-ftr" id="mFooter">
-      <button class="btn b-ghost" id="mCancel">Cancel</button>
-      <button class="btn b-primary" id="mConfirm">Confirm</button>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-outline" id="modalCancel">Cancel</button>
+      <button class="btn-primary" id="modalSubmit">Save</button>
     </div>
   </div>
 </div>
 
-<!-- ══════════ SIDEBAR ══════════ -->
+<!-- ████ SIDEBAR ████ -->
 <aside class="sidebar" id="sidebar">
-
-  <div class="sb-top">
-    <div class="sb-logo">
-      <div class="sbl-icon"><i class="fa-solid fa-hexagon-nodes"></i></div>
-      <div class="sbl-text">
-        <span class="sbl-brand">XBzin</span>
-        <span class="sbl-sub">Ecosystem</span>
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-mark"><i class="fa-solid fa-hexagon-nodes"></i></div>
+      <div class="logo-text-wrap">
+        <span class="logo-title">XBzin</span>
+        <span class="logo-sub">Ecosystem</span>
       </div>
     </div>
-    <button class="sb-collapse-btn" id="sbCollapseBtn" title="Collapse">
-      <i class="fa-solid fa-chevron-left" id="sbCollapseIcon"></i>
-    </button>
+    <button class="sidebar-toggle-pin" id="sidebarPin" title="Collapse"><i class="fa-solid fa-angles-left"></i></button>
   </div>
 
-  <div class="sb-search">
+  <div class="sidebar-search-bar" id="cmdTriggerSidebar">
     <i class="fa-solid fa-magnifying-glass"></i>
-    <input type="text" id="sbSearch" placeholder="Search..." />
-    <span class="sb-search-kbd">⌘K</span>
+    <span>Quick search...</span>
+    <kbd>⌘K</kbd>
   </div>
 
-  <nav class="sb-nav">
-    <p class="sb-nav-label">Main</p>
-    <a class="sb-link active" data-page="overview" href="#">
-      <span class="sbl-ic"><i class="fa-solid fa-gauge-high"></i></span>
-      <span class="sbl-tx">Overview</span>
-      <span class="sbl-badge live-badge">Live</span>
-    </a>
-    <a class="sb-link" data-page="projects" href="#">
-      <span class="sbl-ic"><i class="fa-solid fa-diagram-project"></i></span>
-      <span class="sbl-tx">Projects</span>
-      <span class="sbl-badge count-badge">13</span>
-    </a>
-    <a class="sb-link" data-page="funding" href="#">
-      <span class="sbl-ic"><i class="fa-solid fa-indian-rupee-sign"></i></span>
-      <span class="sbl-tx">Funding</span>
-    </a>
-    <a class="sb-link" data-page="patents" href="#">
-      <span class="sbl-ic"><i class="fa-solid fa-file-shield"></i></span>
-      <span class="sbl-tx">Patents</span>
-      <span class="sbl-badge count-badge green-badge">4</span>
-    </a>
-
-    <p class="sb-nav-label">Ecosystem</p>
-    <a class="sb-link" data-page="ecosystem" href="#">
-      <span class="sbl-ic"><i class="fa-solid fa-cubes"></i></span>
-      <span class="sbl-tx">Modules</span>
-    </a>
-    <a class="sb-link" data-page="analytics" href="#">
-      <span class="sbl-ic"><i class="fa-solid fa-chart-mixed"></i></span>
-      <span class="sbl-tx">Analytics</span>
-    </a>
-    <a class="sb-link" data-page="team" href="#">
-      <span class="sbl-ic"><i class="fa-solid fa-users"></i></span>
-      <span class="sbl-tx">Team</span>
-      <span class="sbl-badge count-badge">16</span>
-    </a>
-
-    <p class="sb-nav-label">System</p>
-    <a class="sb-link" data-page="settings" href="#">
-      <span class="sbl-ic"><i class="fa-solid fa-gear"></i></span>
-      <span class="sbl-tx">Settings</span>
-    </a>
-    <a class="sb-link" data-page="reports" href="#">
-      <span class="sbl-ic"><i class="fa-solid fa-file-chart-column"></i></span>
-      <span class="sbl-tx">Reports</span>
-    </a>
+  <nav class="sidebar-nav">
+    <p class="nav-group">Core</p>
+    <ul>
+      <li><a class="nav-link active" data-section="overview"><span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span><span class="nav-label">Overview</span><span class="nav-chip blue-chip">Live</span></a></li>
+      <li><a class="nav-link" data-section="analytics"><span class="nav-icon"><i class="fa-solid fa-chart-mixed"></i></span><span class="nav-label">Analytics</span></a></li>
+      <li><a class="nav-link" data-section="projects"><span class="nav-icon"><i class="fa-solid fa-diagram-project"></i></span><span class="nav-label">Projects</span><span class="nav-chip red-chip">9</span></a></li>
+    </ul>
+    <p class="nav-group">Finance</p>
+    <ul>
+      <li><a class="nav-link" data-section="funding"><span class="nav-icon"><i class="fa-solid fa-indian-rupee-sign"></i></span><span class="nav-label">Funding</span></a></li>
+      <li><a class="nav-link" data-section="patents"><span class="nav-icon"><i class="fa-solid fa-file-shield"></i></span><span class="nav-label">Patents</span></a></li>
+    </ul>
+    <p class="nav-group">Ecosystem</p>
+    <ul>
+      <li><a class="nav-link" data-section="ecosystem"><span class="nav-icon"><i class="fa-solid fa-cubes"></i></span><span class="nav-label">Modules</span></a></li>
+      <li><a class="nav-link" data-section="team"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Team</span></a></li>
+      <li><a class="nav-link" data-section="activity"><span class="nav-icon"><i class="fa-solid fa-bolt"></i></span><span class="nav-label">Activity Log</span></a></li>
+    </ul>
+    <p class="nav-group">System</p>
+    <ul>
+      <li><a class="nav-link" data-section="settings"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a></li>
+    </ul>
   </nav>
 
-  <div class="sb-profile">
-    <div class="sbp-avatar">BS</div>
-    <div class="sbp-info">
-      <p class="sbp-name">Bharat Shukla</p>
-      <p class="sbp-role"><span class="online-dot"></span>Founder & CEO</p>
+  <div class="sidebar-footer">
+    <div class="sf-status"><span class="sf-dot"></span><span class="sf-status-text">All systems operational</span></div>
+    <div class="sf-user">
+      <div class="sf-avatar">BS</div>
+      <div class="sf-info">
+        <p class="sf-name">Bharat Shukla</p>
+        <p class="sf-role">Founder & CEO</p>
+      </div>
+      <button class="sf-more" id="sfMoreBtn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>
-    <button class="sbp-menu" onclick="navigateTo('settings')"><i class="fa-solid fa-ellipsis-vertical"></i></button>
   </div>
 </aside>
 
-<div class="sb-overlay" id="sbOverlay"></div>
+<div class="overlay" id="overlay"></div>
 
-<!-- ══════════ MAIN ══════════ -->
-<div class="main-wrap" id="mainWrap">
+<!-- ████ MAIN ████ -->
+<div class="main-wrapper" id="mainWrapper">
 
   <!-- TOPBAR -->
   <header class="topbar">
     <div class="tb-left">
-      <button class="hamburger" id="hamburger">
-        <i class="fa-solid fa-bars"></i>
-      </button>
+      <button class="hamburger" id="menuToggle"><span></span><span></span><span></span></button>
       <div class="breadcrumb">
-        <span class="bc-root">XBzin</span>
-        <i class="fa-solid fa-chevron-right bc-sep"></i>
-        <span class="bc-page" id="bcPage">Overview</span>
+        <i class="fa-solid fa-house bc-home"></i>
+        <i class="fa-solid fa-chevron-right bc-arrow"></i>
+        <span id="bcCurrent">Overview</span>
       </div>
     </div>
 
     <div class="tb-center">
-      <div class="gsearch" id="gsearch">
+      <button class="cmd-pill" id="cmdTrigger">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input id="gsInput" type="text" placeholder="Search projects, modules, patents..."/>
-        <span class="gs-kbd">⌘K</span>
-        <div class="gs-results" id="gsResults"></div>
-      </div>
+        <span>Search anything...</span>
+        <kbd>⌘K</kbd>
+      </button>
     </div>
 
     <div class="tb-right">
-      <button class="tb-btn" id="themeBtn" title="Toggle dark mode"><i class="fa-solid fa-moon" id="themeIco"></i></button>
+      <div class="live-time" id="liveClock"></div>
 
+      <button class="tb-btn" id="themeToggle" title="Toggle dark mode"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
+      <button class="tb-btn" id="fullscreenBtn" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
+      <button class="tb-btn" id="exportBtn" title="Export PDF"><i class="fa-solid fa-download"></i></button>
+
+      <!-- Notifications -->
       <div class="notif-wrap">
-        <button class="tb-btn" id="notifBtn">
+        <button class="tb-btn notif-trigger-btn" id="notifTrigger">
           <i class="fa-solid fa-bell"></i>
-          <span class="n-badge" id="nBadge">3</span>
+          <span class="notif-dot-badge" id="notifBadge">3</span>
         </button>
         <div class="notif-panel" id="notifPanel">
-          <div class="np-hdr">
-            <h4>Notifications</h4>
-            <button id="markAllRead" onclick="markAllNotifs()">Mark all read</button>
+          <div class="np-head">
+            <span>Notifications</span>
+            <button id="clearAllNotif">Clear all</button>
           </div>
-          <div class="np-body" id="npBody"></div>
-          <div class="np-ftr"><button onclick="showToast('Notification center coming soon','info')">View all</button></div>
+          <div class="np-list" id="notifList">
+            <div class="np-item unread" data-nid="1">
+              <div class="np-icon-av green-av"><i class="fa-solid fa-file-shield"></i></div>
+              <div class="np-body">
+                <p>Patent PAT-004 filing submitted successfully</p>
+                <span>XBzin AI Hub · 2h ago</span>
+              </div>
+              <button class="np-x" data-nid="1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="np-item unread" data-nid="2">
+              <div class="np-icon-av yellow-av"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+              <div class="np-body">
+                <p>Funding Round 2 report ready for review</p>
+                <span>Finance · 5h ago</span>
+              </div>
+              <button class="np-x" data-nid="2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="np-item unread" data-nid="3">
+              <div class="np-icon-av red-av"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div class="np-body">
+                <p>9 projects require immediate review</p>
+                <span>Projects · 1d ago</span>
+              </div>
+              <button class="np-x" data-nid="3"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- Profile -->
       <div class="profile-wrap">
         <button class="profile-btn" id="profileBtn">
-          <div class="pf-av">BS</div>
-          <div class="pf-meta">
-            <span class="pf-name">Bharat Shukla</span>
-            <span class="pf-role">CEO</span>
+          <div class="profile-av">BS</div>
+          <div class="profile-txt">
+            <p>Bharat Shukla</p>
+            <span>Founder & CEO</span>
           </div>
-          <i class="fa-solid fa-chevron-down pf-caret"></i>
+          <i class="fa-solid fa-chevron-down"></i>
         </button>
-        <div class="profile-menu" id="profileMenu">
-          <div class="pm-top">
-            <div class="pm-av">BS</div>
-            <div>
-              <p class="pmt-name">Bharat Shukla</p>
-              <p class="pmt-role">Founder & CEO · XBzin</p>
-            </div>
+        <div class="profile-dropdown hidden" id="profileDropdown">
+          <div class="pd-top">
+            <div class="pd-av-big">BS</div>
+            <div><p class="pd-name">Bharat Shukla</p><p class="pd-email">bharat@xbzin.com</p></div>
           </div>
-          <hr/>
-          <button onclick="navigateTo('settings')"><i class="fa-solid fa-gear"></i> Settings</button>
-          <button onclick="showToast('Opening profile editor...','info')"><i class="fa-solid fa-user-pen"></i> Edit Profile</button>
-          <button onclick="downloadAllData()"><i class="fa-solid fa-download"></i> Export All Data</button>
-          <hr/>
-          <button class="danger-btn" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+          <div class="pd-links">
+            <a><i class="fa-solid fa-user"></i>My Profile</a>
+            <a><i class="fa-solid fa-gear"></i>Account Settings</a>
+            <a><i class="fa-solid fa-shield-halved"></i>Security</a>
+            <a><i class="fa-solid fa-chart-bar"></i>My Reports</a>
+            <div class="pd-sep"></div>
+            <a class="pd-danger"><i class="fa-solid fa-right-from-bracket"></i>Sign Out</a>
+          </div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- ══════════ PAGE CONTAINER ══════════ -->
-  <main class="pages">
+  <!-- CONTENT -->
+  <main class="content" id="mainContent">
 
-    <!-- ===== OVERVIEW PAGE ===== -->
-    <div class="page active" id="page-overview">
-      <div class="ph">
-        <div class="ph-left">
-          <h1>Dashboard Overview</h1>
-          <p>XBzin Ecosystem · Real-time analytics · FY 2024–25</p>
+    <!-- ═══ OVERVIEW ═══ -->
+    <section class="pg-section" id="overview">
+      <div class="section-hero">
+        <div class="sh-left">
+          <div class="sh-tag"><span class="pulse-dot"></span> Live · FY 2024–25</div>
+          <h1>XBzin Ecosystem</h1>
+          <p>Complete analytics & management dashboard · Founded by Bharat Shukla</p>
         </div>
-        <div class="ph-right">
-          <button class="btn b-ghost" onclick="refreshDashboard()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
-          <button class="btn b-primary" onclick="exportReport()"><i class="fa-solid fa-download"></i> Export Report</button>
+        <div class="sh-right">
+          <div class="valuation-card">
+            <div class="vc-icon"><i class="fa-solid fa-building-columns"></i></div>
+            <div class="vc-body">
+              <p class="vc-label">Company Valuation</p>
+              <p class="vc-amount">₹1,00,00,000</p>
+              <p class="vc-sub">XBzin Ecosystem · 2025</p>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <!-- Status Bar -->
-      <div class="status-bar">
-        <span class="sb-item"><span class="pulse-dot green-pulse"></span>All systems operational</span>
-        <span class="sb-item"><i class="fa-solid fa-calendar-days"></i> <span id="liveTime"></span></span>
-        <span class="sb-item"><i class="fa-solid fa-server"></i> Server: Online</span>
-        <span class="sb-item"><i class="fa-solid fa-shield-halved"></i> Security: Active</span>
-        <span class="sb-item"><i class="fa-solid fa-database"></i> DB: Connected</span>
       </div>
 
       <!-- KPI Grid -->
       <div class="kpi-grid">
-        <div class="kpi-card accent-blue" onclick="navigateTo('team')" style="cursor:pointer">
-          <div class="kc-top"><div class="kc-icon blue-wrap"><i class="fa-solid fa-users"></i></div><span class="kc-trend up"><i class="fa-solid fa-arrow-trend-up"></i>+2</span></div>
-          <div class="kc-num" data-target="16">0</div>
-          <div class="kc-lbl">Total Employees</div>
-          <div class="kc-bar"><div class="kc-fill blue-fill" style="--p:100%"></div></div>
-          <div class="kc-foot"><span>Full team active</span><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="kpi-card kc-blue">
+          <div class="kc-top"><span class="kc-label">Total Employees</span><div class="kc-icon blue-icon-bg"><i class="fa-solid fa-users"></i></div></div>
+          <div class="kc-val" data-target="16">0</div>
+          <div class="kc-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> Active team</div>
+          <div class="kc-spark-wrap"><canvas class="spark-canvas" data-vals="8,10,11,13,14,14,16" data-color="#2563eb"></canvas></div>
         </div>
-        <div class="kpi-card accent-green" onclick="navigateTo('projects')" style="cursor:pointer">
-          <div class="kc-top"><div class="kc-icon green-wrap"><i class="fa-solid fa-circle-check"></i></div><span class="kc-trend up"><i class="fa-solid fa-arrow-trend-up"></i>+12</span></div>
-          <div class="kc-num" data-target="129">0</div>
-          <div class="kc-lbl">Projects Completed</div>
-          <div class="kc-bar"><div class="kc-fill green-fill" style="--p:90%"></div></div>
-          <div class="kc-foot"><span>All-time record</span><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="kpi-card kc-green">
+          <div class="kc-top"><span class="kc-label">Projects Completed</span><div class="kc-icon green-icon-bg"><i class="fa-solid fa-circle-check"></i></div></div>
+          <div class="kc-val" data-target="129">0</div>
+          <div class="kc-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> All time</div>
+          <div class="kc-spark-wrap"><canvas class="spark-canvas" data-vals="40,60,78,95,108,119,129" data-color="#22c55e"></canvas></div>
         </div>
-        <div class="kpi-card accent-yellow" onclick="navigateTo('projects')" style="cursor:pointer">
-          <div class="kc-top"><div class="kc-icon yellow-wrap"><i class="fa-solid fa-rotate"></i></div><span class="kc-trend neutral"><i class="fa-solid fa-minus"></i>No change</span></div>
-          <div class="kc-num" data-target="4">0</div>
-          <div class="kc-lbl">Ongoing Projects</div>
-          <div class="kc-bar"><div class="kc-fill yellow-fill" style="--p:30%"></div></div>
-          <div class="kc-foot"><span>In progress</span><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="kpi-card kc-yellow">
+          <div class="kc-top"><span class="kc-label">Ongoing Projects</span><div class="kc-icon yellow-icon-bg"><i class="fa-solid fa-rotate fa-spin"></i></div></div>
+          <div class="kc-val" data-target="4">0</div>
+          <div class="kc-trend neutral"><i class="fa-solid fa-minus"></i> In progress</div>
+          <div class="kc-spark-wrap"><canvas class="spark-canvas" data-vals="2,3,5,6,4,5,4" data-color="#f5b800"></canvas></div>
         </div>
-        <div class="kpi-card accent-red" onclick="navigateTo('projects')" style="cursor:pointer">
-          <div class="kc-top"><div class="kc-icon red-wrap"><i class="fa-solid fa-clock"></i></div><span class="kc-trend down"><i class="fa-solid fa-arrow-trend-down"></i>-3</span></div>
-          <div class="kc-num" data-target="9">0</div>
-          <div class="kc-lbl">Pending Projects</div>
-          <div class="kc-bar"><div class="kc-fill red-fill" style="--p:62%"></div></div>
-          <div class="kc-foot"><span>Needs attention</span><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="kpi-card kc-red">
+          <div class="kc-top"><span class="kc-label">Pending Projects</span><div class="kc-icon red-icon-bg"><i class="fa-solid fa-clock"></i></div></div>
+          <div class="kc-val" data-target="9">0</div>
+          <div class="kc-trend negative"><i class="fa-solid fa-arrow-trend-down"></i> Needs action</div>
+          <div class="kc-spark-wrap"><canvas class="spark-canvas" data-vals="3,5,7,8,9,9,9" data-color="#e84040"></canvas></div>
         </div>
-        <div class="kpi-card accent-green" onclick="navigateTo('funding')" style="cursor:pointer">
-          <div class="kc-top"><div class="kc-icon green-wrap"><i class="fa-solid fa-building"></i></div><span class="kc-trend up"><i class="fa-solid fa-arrow-trend-up"></i>+18%</span></div>
-          <div class="kc-num">₹1 Cr</div>
-          <div class="kc-lbl">Company Valuation</div>
-          <div class="kc-bar"><div class="kc-fill green-fill" style="--p:100%"></div></div>
-          <div class="kc-foot"><span>Current market cap</span><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="kpi-card kc-green">
+          <div class="kc-top"><span class="kc-label">Total Investment</span><div class="kc-icon green-icon-bg"><i class="fa-solid fa-sack-dollar"></i></div></div>
+          <div class="kc-val">₹43L</div>
+          <div class="kc-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 2 funding rounds</div>
+          <div class="kc-spark-wrap"><canvas class="spark-canvas" data-vals="0,5,10,16,16,35,43" data-color="#22c55e"></canvas></div>
         </div>
-        <div class="kpi-card accent-blue" onclick="navigateTo('funding')" style="cursor:pointer">
-          <div class="kc-top"><div class="kc-icon blue-wrap"><i class="fa-solid fa-sack-dollar"></i></div><span class="kc-trend up"><i class="fa-solid fa-arrow-trend-up"></i>2 Rounds</span></div>
-          <div class="kc-num">₹43L</div>
-          <div class="kc-lbl">Total Investment</div>
-          <div class="kc-bar"><div class="kc-fill blue-fill" style="--p:55%"></div></div>
-          <div class="kc-foot"><span>Raised so far</span><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="kpi-card kc-red">
+          <div class="kc-top"><span class="kc-label">Fund Utilized</span><div class="kc-icon red-icon-bg"><i class="fa-solid fa-money-bill-wave"></i></div></div>
+          <div class="kc-val">₹78L</div>
+          <div class="kc-trend neutral"><i class="fa-solid fa-minus"></i> 81.3% utilized</div>
+          <div class="kc-spark-wrap"><canvas class="spark-canvas" data-vals="12,28,45,55,62,70,78" data-color="#e84040"></canvas></div>
         </div>
-        <div class="kpi-card accent-red" onclick="navigateTo('funding')" style="cursor:pointer">
-          <div class="kc-top"><div class="kc-icon red-wrap"><i class="fa-solid fa-money-bill-wave"></i></div><span class="kc-trend neutral"><i class="fa-solid fa-minus"></i>81.3%</span></div>
-          <div class="kc-num">₹78L</div>
-          <div class="kc-lbl">Fund Utilized</div>
-          <div class="kc-bar"><div class="kc-fill red-fill" style="--p:81%"></div></div>
-          <div class="kc-foot"><span>Of economic fund</span><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="kpi-card kc-yellow">
+          <div class="kc-top"><span class="kc-label">Total Patents</span><div class="kc-icon yellow-icon-bg"><i class="fa-solid fa-file-shield"></i></div></div>
+          <div class="kc-val" data-target="4">0</div>
+          <div class="kc-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 3 granted, 1 pending</div>
+          <div class="kc-spark-wrap"><canvas class="spark-canvas" data-vals="0,1,1,2,3,3,4" data-color="#f5b800"></canvas></div>
         </div>
-        <div class="kpi-card accent-yellow" onclick="navigateTo('patents')" style="cursor:pointer">
-          <div class="kc-top"><div class="kc-icon yellow-wrap"><i class="fa-solid fa-file-shield"></i></div><span class="kc-trend up"><i class="fa-solid fa-arrow-trend-up"></i>+1 new</span></div>
-          <div class="kc-num" data-target="4">0</div>
-          <div class="kc-lbl">Total Patents</div>
-          <div class="kc-bar"><div class="kc-fill yellow-fill" style="--p:75%"></div></div>
-          <div class="kc-foot"><span>3 granted · 1 pending</span><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="kpi-card kc-blue">
+          <div class="kc-top"><span class="kc-label">Ecosystem Modules</span><div class="kc-icon blue-icon-bg"><i class="fa-solid fa-cubes"></i></div></div>
+          <div class="kc-val" data-target="4">0</div>
+          <div class="kc-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> All active</div>
+          <div class="kc-spark-wrap"><canvas class="spark-canvas" data-vals="1,1,2,2,3,3,4" data-color="#2563eb"></canvas></div>
         </div>
       </div>
 
-      <!-- Charts Row 1 -->
-      <div class="chart-row two-one">
-        <div class="chart-card">
-          <div class="cc-hdr">
-            <div><h3>Project Delivery Timeline</h3><p>Monthly completed projects</p></div>
-            <select class="cc-sel" id="projLineFilter" onchange="updateProjLine(this.value)">
-              <option value="6">6 months</option>
-              <option value="12" selected>12 months</option>
-            </select>
+      <!-- Quick stats bar -->
+      <div class="qs-bar">
+        <div class="qs-item"><i class="fa-solid fa-user-tie blue"></i><div><p>Founder & CEO</p><strong>Bharat Shukla</strong></div></div>
+        <div class="qs-sep"></div>
+        <div class="qs-item"><i class="fa-solid fa-building green"></i><div><p>Company Valuation</p><strong>₹1 Crore</strong></div></div>
+        <div class="qs-sep"></div>
+        <div class="qs-item"><i class="fa-solid fa-layer-group yellow"></i><div><p>Ecosystem Modules</p><strong>4 Active</strong></div></div>
+        <div class="qs-sep"></div>
+        <div class="qs-item"><i class="fa-solid fa-diagram-project red"></i><div><p>Total Projects</p><strong>142 (All Status)</strong></div></div>
+        <div class="qs-sep"></div>
+        <div class="qs-item"><i class="fa-solid fa-shield-halved blue"></i><div><p>IP Portfolio</p><strong>4 Patents Filed</strong></div></div>
+      </div>
+    </section>
+
+    <!-- ═══ ANALYTICS ═══ -->
+    <section class="pg-section" id="analytics">
+      <div class="section-header-row">
+        <div><h2 class="sec-h2">Analytics & Charts</h2><p class="sec-p">Visual breakdown of key metrics</p></div>
+        <div class="shr-actions">
+          <select class="sel-input" id="chartPeriod"><option>All Time</option><option>FY 2024-25</option><option>FY 2023-24</option></select>
+          <button class="btn-outline" id="refreshCharts"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+      </div>
+
+      <div class="charts-master-grid">
+        <!-- Project Status - Doughnut -->
+        <div class="chart-card" id="cc1">
+          <div class="cc-head">
+            <div><p class="cc-title">Project Status</p><p class="cc-sub">142 total projects</p></div>
+            <div class="cc-actions">
+              <button class="cc-btn" onclick="downloadChart('projectChart','Project Status')"><i class="fa-solid fa-download"></i></button>
+              <button class="cc-btn" onclick="expandChart('cc1','Project Status')"><i class="fa-solid fa-expand"></i></button>
+            </div>
           </div>
-          <div class="chart-body"><canvas id="projLineChart"></canvas></div>
-        </div>
-        <div class="chart-card donut-card">
-          <div class="cc-hdr"><div><h3>Project Status</h3><p>Current snapshot</p></div></div>
-          <div class="donut-wrap">
-            <canvas id="projDonutChart"></canvas>
-            <div class="donut-center"><span class="dc-num">142</span><span class="dc-lbl">Total</span></div>
-          </div>
-          <div class="chart-legend">
-            <div class="cl-row"><span class="cl-dot" style="background:var(--green)"></span><span>Completed</span><strong>129</strong></div>
-            <div class="cl-row"><span class="cl-dot" style="background:var(--yellow)"></span><span>Ongoing</span><strong>4</strong></div>
-            <div class="cl-row"><span class="cl-dot" style="background:var(--red)"></span><span>Pending</span><strong>9</strong></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom Row -->
-      <div class="chart-row two-two">
-        <div class="mini-card">
-          <div class="mc-hdr"><h3>Recent Activity</h3><button class="btn-link" onclick="navigateTo('projects')">View all →</button></div>
-          <div class="activity-feed" id="activityFeed"></div>
-        </div>
-        <div class="mini-card">
-          <div class="mc-hdr"><h3>Ecosystem Health</h3><button class="btn-link" onclick="navigateTo('ecosystem')">View all →</button></div>
-          <div class="health-list" id="healthList"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== PROJECTS PAGE ===== -->
-    <div class="page" id="page-projects">
-      <div class="ph">
-        <div class="ph-left"><h1>Project Management</h1><p>Track, manage & deliver all XBzin projects</p></div>
-        <div class="ph-right">
-          <button class="btn b-ghost" onclick="exportTableCSV()"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
-          <button class="btn b-primary" onclick="showAddProjectModal()"><i class="fa-solid fa-plus"></i> Add Project</button>
-        </div>
-      </div>
-
-      <div class="proj-stat-strip">
-        <div class="pss-item green-top"><div class="pss-ic green-wrap"><i class="fa-solid fa-circle-check"></i></div><div class="pss-num" data-target="129">0</div><div class="pss-lbl">Completed</div></div>
-        <div class="pss-item yellow-top"><div class="pss-ic yellow-wrap"><i class="fa-solid fa-rotate"></i></div><div class="pss-num" data-target="4">0</div><div class="pss-lbl">Ongoing</div></div>
-        <div class="pss-item red-top"><div class="pss-ic red-wrap"><i class="fa-solid fa-clock"></i></div><div class="pss-num" data-target="9">0</div><div class="pss-lbl">Pending</div></div>
-        <div class="pss-item blue-top"><div class="pss-ic blue-wrap"><i class="fa-solid fa-layer-group"></i></div><div class="pss-num" data-target="142">0</div><div class="pss-lbl">Total</div></div>
-      </div>
-
-      <div class="chart-row two-two">
-        <div class="chart-card"><div class="cc-hdr"><h3>Status Breakdown</h3></div><div class="chart-body"><canvas id="projBarChart"></canvas></div></div>
-        <div class="chart-card"><div class="cc-hdr"><h3>Module Delivery</h3></div><div class="chart-body"><canvas id="projModuleChart"></canvas></div></div>
-      </div>
-
-      <div class="table-card">
-        <div class="tc-hdr">
-          <h3>All Projects <span class="tc-count" id="tcCount">0</span></h3>
-          <div class="tc-ctrl">
-            <div class="tc-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="projSearch" placeholder="Search projects..." oninput="filterProjects()"/></div>
-            <select class="cc-sel" id="projStatusFilter" onchange="filterProjects()">
-              <option value="all">All Status</option>
-              <option value="Ongoing">Ongoing</option>
-              <option value="Pending">Pending</option>
-              <option value="Completed">Completed</option>
-            </select>
-            <select class="cc-sel" id="projModuleFilter" onchange="filterProjects()">
-              <option value="all">All Modules</option>
-              <option value="AI Hub">AI Hub</option>
-              <option value="Web Services">Web Services</option>
-              <option value="Tools">Tools</option>
-              <option value="Community">Community</option>
-            </select>
+          <div class="cc-doughnut-layout">
+            <div class="doughnut-container">
+              <canvas id="projectChart"></canvas>
+              <div class="doughnut-inner-label"><span class="dil-num">142</span><span class="dil-txt">Total</span></div>
+            </div>
+            <div class="doughnut-legend-list">
+              <div class="dll-item"><div class="dll-color" style="background:var(--green)"></div><div><p class="dll-name">Completed</p><p class="dll-val">129 <em>90.8%</em></p></div></div>
+              <div class="dll-item"><div class="dll-color" style="background:var(--yellow)"></div><div><p class="dll-name">Ongoing</p><p class="dll-val">4 <em>2.8%</em></p></div></div>
+              <div class="dll-item"><div class="dll-color" style="background:var(--red)"></div><div><p class="dll-name">Pending</p><p class="dll-val">9 <em>6.3%</em></p></div></div>
+            </div>
           </div>
         </div>
-        <div class="table-wrap">
-          <table class="data-tbl" id="projTable">
+
+        <!-- Funding - Bar -->
+        <div class="chart-card" id="cc2">
+          <div class="cc-head">
+            <div><p class="cc-title">Funding Rounds</p><p class="cc-sub">₹35L total raised</p></div>
+            <div class="cc-actions">
+              <button class="cc-btn" onclick="downloadChart('fundingChart','Funding Rounds')"><i class="fa-solid fa-download"></i></button>
+              <button class="cc-btn" onclick="expandChart('cc2','Funding Rounds')"><i class="fa-solid fa-expand"></i></button>
+            </div>
+          </div>
+          <div class="cc-body"><canvas id="fundingChart"></canvas></div>
+        </div>
+
+        <!-- Investment vs Usage - Line (wide) -->
+        <div class="chart-card chart-wide" id="cc3">
+          <div class="cc-head">
+            <div><p class="cc-title">Investment vs Fund Utilization</p><p class="cc-sub">Quarterly timeline — FY 2023 to FY 2025</p></div>
+            <div class="cc-actions">
+              <button class="cc-btn" onclick="downloadChart('investChart','Investment vs Utilization')"><i class="fa-solid fa-download"></i></button>
+              <button class="cc-btn" onclick="expandChart('cc3','Investment vs Utilization')"><i class="fa-solid fa-expand"></i></button>
+            </div>
+          </div>
+          <div class="cc-body cc-body-tall"><canvas id="investChart"></canvas></div>
+        </div>
+
+        <!-- Patent - Pie -->
+        <div class="chart-card" id="cc4">
+          <div class="cc-head">
+            <div><p class="cc-title">Patent Portfolio</p><p class="cc-sub">4 total filings</p></div>
+            <div class="cc-actions">
+              <button class="cc-btn" onclick="downloadChart('patentChart','Patent Portfolio')"><i class="fa-solid fa-download"></i></button>
+              <button class="cc-btn" onclick="expandChart('cc4','Patent Portfolio')"><i class="fa-solid fa-expand"></i></button>
+            </div>
+          </div>
+          <div class="cc-doughnut-layout">
+            <div class="doughnut-container">
+              <canvas id="patentChart"></canvas>
+              <div class="doughnut-inner-label"><span class="dil-num">4</span><span class="dil-txt">Patents</span></div>
+            </div>
+            <div class="doughnut-legend-list">
+              <div class="dll-item"><div class="dll-color" style="background:var(--green)"></div><div><p class="dll-name">Granted</p><p class="dll-val">3 <em>75%</em></p></div></div>
+              <div class="dll-item"><div class="dll-color" style="background:var(--yellow)"></div><div><p class="dll-name">Pending</p><p class="dll-val">1 <em>25%</em></p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PROJECTS ═══ -->
+    <section class="pg-section" id="projects">
+      <div class="section-header-row">
+        <div><h2 class="sec-h2">Project Management</h2><p class="sec-p">Full lifecycle tracking across all modules</p></div>
+        <div class="shr-actions">
+          <button class="btn-outline" id="exportProjectsBtn"><i class="fa-solid fa-file-export"></i> Export CSV</button>
+          <button class="btn-primary" id="addProjectBtn"><i class="fa-solid fa-plus"></i> New Project</button>
+        </div>
+      </div>
+
+      <div class="proj-summary-row">
+        <div class="psr-card" style="--top-c:var(--green)">
+          <div class="psr-icon green-icon-bg"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="psr-body">
+            <p class="psr-label">Completed</p>
+            <p class="psr-num">129</p>
+            <div class="psr-bar"><div class="psr-fill" style="width:90.8%;background:var(--green)"></div></div>
+            <p class="psr-pct">90.8%</p>
+          </div>
+        </div>
+        <div class="psr-card" style="--top-c:var(--yellow)">
+          <div class="psr-icon yellow-icon-bg"><i class="fa-solid fa-rotate fa-spin"></i></div>
+          <div class="psr-body">
+            <p class="psr-label">Ongoing</p>
+            <p class="psr-num">4</p>
+            <div class="psr-bar"><div class="psr-fill" style="width:2.8%;background:var(--yellow)"></div></div>
+            <p class="psr-pct">2.8%</p>
+          </div>
+        </div>
+        <div class="psr-card" style="--top-c:var(--red)">
+          <div class="psr-icon red-icon-bg"><i class="fa-solid fa-clock"></i></div>
+          <div class="psr-body">
+            <p class="psr-label">Pending</p>
+            <p class="psr-num">9</p>
+            <div class="psr-bar"><div class="psr-fill" style="width:6.3%;background:var(--red)"></div></div>
+            <p class="psr-pct">6.3%</p>
+          </div>
+        </div>
+        <div class="psr-card" style="--top-c:var(--blue)">
+          <div class="psr-icon blue-icon-bg"><i class="fa-solid fa-layer-group"></i></div>
+          <div class="psr-body">
+            <p class="psr-label">Total</p>
+            <p class="psr-num">142</p>
+            <div class="psr-bar"><div class="psr-fill" style="width:100%;background:var(--blue)"></div></div>
+            <p class="psr-pct">All modules</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-controls-bar">
+        <div class="search-input-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="projectSearch" placeholder="Search projects by name, module..."/>
+        </div>
+        <div class="filter-pill-group" id="filterPills">
+          <button class="fpill active" data-filter="all">All</button>
+          <button class="fpill" data-filter="ongoing">Ongoing</button>
+          <button class="fpill" data-filter="pending">Pending</button>
+          <button class="fpill" data-filter="completed">Completed</button>
+        </div>
+        <select class="sel-input" id="moduleFilter">
+          <option value="all">All Modules</option>
+          <option value="XBzin AI Hub">AI Hub</option>
+          <option value="XBzin Web Services">Web Services</option>
+          <option value="XBzin Tools">Tools</option>
+          <option value="XBzin Community">Community</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table class="pro-table" id="projectTable">
             <thead>
               <tr>
-                <th class="sortable" onclick="sortTable(0)">#<i class="fa-solid fa-sort fa-xs"></i></th>
-                <th class="sortable" onclick="sortTable(1)">Project Name<i class="fa-solid fa-sort fa-xs"></i></th>
-                <th class="sortable" onclick="sortTable(2)">Module<i class="fa-solid fa-sort fa-xs"></i></th>
-                <th class="sortable" onclick="sortTable(3)">Status<i class="fa-solid fa-sort fa-xs"></i></th>
-                <th class="sortable" onclick="sortTable(4)">Priority<i class="fa-solid fa-sort fa-xs"></i></th>
+                <th class="th-sort" data-col="id"># <i class="fa-solid fa-sort"></i></th>
+                <th class="th-sort" data-col="name">Project Name <i class="fa-solid fa-sort"></i></th>
+                <th class="th-sort" data-col="module">Module <i class="fa-solid fa-sort"></i></th>
+                <th class="th-sort" data-col="status">Status <i class="fa-solid fa-sort"></i></th>
+                <th class="th-sort" data-col="priority">Priority <i class="fa-solid fa-sort"></i></th>
                 <th>Progress</th>
+                <th>Lead</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody id="projTbody"></tbody>
+            <tbody id="projectTbody"></tbody>
           </table>
         </div>
         <div class="table-foot">
-          <span id="projInfo">Showing 0 records</span>
-          <div class="pagination" id="projPagination"></div>
+          <span class="table-info-txt" id="tableInfo">Showing 0 of 0</span>
+          <div class="pagination-wrap" id="pagination"></div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ===== FUNDING PAGE ===== -->
-    <div class="page" id="page-funding">
-      <div class="ph">
-        <div class="ph-left"><h1>Funding & Investment</h1><p>Complete financial overview of XBzin Ecosystem</p></div>
-        <div class="ph-right"><button class="btn b-primary" onclick="exportReport()"><i class="fa-solid fa-file-pdf"></i> Financial Report</button></div>
-      </div>
-
-      <div class="valuation-hero">
-        <div class="vh-left">
-          <p class="vh-eyebrow">Total Company Valuation</p>
-          <h2 class="vh-val">₹1,00,00,000</h2>
-          <p class="vh-sub">Founded by Bharat Shukla · FY 2024–25</p>
-        </div>
-        <div class="vh-stats">
-          <div class="vhs"><span class="vhs-n">₹43L</span><span class="vhs-l">Total Raised</span></div>
-          <div class="vhs-div"></div>
-          <div class="vhs"><span class="vhs-n">₹78L</span><span class="vhs-l">Utilized</span></div>
-          <div class="vhs-div"></div>
-          <div class="vhs"><span class="vhs-n">16</span><span class="vhs-l">Employees</span></div>
-          <div class="vhs-div"></div>
-          <div class="vhs"><span class="vhs-n">2</span><span class="vhs-l">Rounds</span></div>
+    <!-- ═══ FUNDING ═══ -->
+    <section class="pg-section" id="funding">
+      <div class="section-header-row">
+        <div><h2 class="sec-h2">Funding & Investment</h2><p class="sec-p">Complete financial overview of XBzin Ecosystem</p></div>
+        <div class="shr-actions">
+          <button class="btn-outline"><i class="fa-solid fa-file-pdf"></i> Financial Report</button>
         </div>
       </div>
 
-      <div class="fund-cards">
-        <div class="fund-card fc-blue"><div class="fcr-top"><i class="fa-solid fa-seedling"></i><span class="fcr-tag">Round 1 · Seed</span></div><h3>₹16,00,000</h3><p>Seed Funding</p><div class="fcr-bar"><div class="fcr-fill" style="--w:46%;background:var(--blue)"></div></div><div class="fcr-bot"><span>46% of total investment</span></div></div>
-        <div class="fund-card fc-green"><div class="fcr-top"><i class="fa-solid fa-rocket"></i><span class="fcr-tag">Round 2 · Series A</span></div><h3>₹19,00,000</h3><p>Series A Investment</p><div class="fcr-bar"><div class="fcr-fill" style="--w:54%;background:var(--green)"></div></div><div class="fcr-bot"><span>54% of total investment</span></div></div>
-        <div class="fund-card fc-dark"><div class="fcr-top"><i class="fa-solid fa-wallet"></i><span class="fcr-tag">Aggregate</span></div><h3>₹43,00,000</h3><p>Total Investment Raised</p><div class="fcr-bar"><div class="fcr-fill" style="--w:100%;background:var(--black)"></div></div><div class="fcr-bot"><span>Across 2 rounds</span></div></div>
-        <div class="fund-card fc-red"><div class="fcr-top"><i class="fa-solid fa-chart-pie"></i><span class="fcr-tag">Deployed</span></div><h3>₹78,00,000</h3><p>Economic Fund Utilized</p><div class="fcr-bar"><div class="fcr-fill" style="--w:81%;background:var(--red)"></div></div><div class="fcr-bot"><span>81.3% deployed</span></div></div>
+      <div class="finance-hero-card">
+        <div class="fhc-main">
+          <p class="fhc-label">Total Company Valuation</p>
+          <h2 class="fhc-amount">₹1,00,00,000</h2>
+          <p class="fhc-sub">XBzin Ecosystem · Founder: Bharat Shukla · FY 2024–25</p>
+        </div>
+        <div class="fhc-metrics">
+          <div class="fhcm-item"><p>Total Raised</p><strong class="blue">₹43L</strong></div>
+          <div class="fhcm-div"></div>
+          <div class="fhcm-item"><p>Fund Utilized</p><strong class="red">₹78L</strong></div>
+          <div class="fhcm-div"></div>
+          <div class="fhcm-item"><p>Utilization</p><strong class="yellow">81.3%</strong></div>
+          <div class="fhcm-div"></div>
+          <div class="fhcm-item"><p>Funding Rounds</p><strong class="green">2</strong></div>
+        </div>
       </div>
 
-      <div class="chart-row two-two">
-        <div class="chart-card"><div class="cc-hdr"><h3>Funding Rounds</h3><p>₹ in Lakhs</p></div><div class="chart-body"><canvas id="fundBarChart"></canvas></div></div>
-        <div class="chart-card"><div class="cc-hdr"><h3>Investment vs Utilization</h3><p>Quarterly trend</p></div><div class="chart-body"><canvas id="investLineChart"></canvas></div></div>
+      <div class="fund-cards-row">
+        <div class="fund-card-v2" style="--ac:var(--blue)">
+          <div class="fc2-label">ROUND 1 · SEED</div>
+          <h3 class="fc2-amount">₹16,00,000</h3>
+          <p class="fc2-desc">Initial seed funding for product development and team formation.</p>
+          <div class="fc2-bar-row"><div class="fc2-bar-bg"><div class="fc2-fill" style="width:46%;background:var(--blue)"></div></div><span>46%</span></div>
+          <div class="fc2-meta"><span><i class="fa-solid fa-calendar"></i> FY 2023-24</span><span class="badge-green">Completed</span></div>
+        </div>
+        <div class="fund-card-v2" style="--ac:var(--green)">
+          <div class="fc2-label">ROUND 2 · SERIES A</div>
+          <h3 class="fc2-amount">₹19,00,000</h3>
+          <p class="fc2-desc">Series A for scaling operations, hiring, and ecosystem expansion.</p>
+          <div class="fc2-bar-row"><div class="fc2-bar-bg"><div class="fc2-fill" style="width:54%;background:var(--green)"></div></div><span>54%</span></div>
+          <div class="fc2-meta"><span><i class="fa-solid fa-calendar"></i> FY 2024-25</span><span class="badge-green">Completed</span></div>
+        </div>
+        <div class="fund-card-v2" style="--ac:var(--black)">
+          <div class="fc2-label">TOTAL INVESTMENT</div>
+          <h3 class="fc2-amount">₹43,00,000</h3>
+          <p class="fc2-desc">Combined investment from Round 1 and Round 2 funding.</p>
+          <div class="fc2-bar-row"><div class="fc2-bar-bg"><div class="fc2-fill" style="width:100%;background:var(--black)"></div></div><span>100%</span></div>
+          <div class="fc2-meta"><span><i class="fa-solid fa-layer-group"></i> 2 Rounds</span><span class="badge-blue">Active</span></div>
+        </div>
+        <div class="fund-card-v2" style="--ac:var(--red)">
+          <div class="fc2-label">ECONOMIC FUND UTILIZED</div>
+          <h3 class="fc2-amount">₹78,00,000</h3>
+          <p class="fc2-desc">Total economic fund deployed across all operations and projects.</p>
+          <div class="fc2-bar-row"><div class="fc2-bar-bg"><div class="fc2-fill" style="width:81%;background:var(--red)"></div></div><span>81%</span></div>
+          <div class="fc2-meta"><span><i class="fa-solid fa-chart-pie"></i> 81.3% rate</span><span class="badge-yellow">Monitoring</span></div>
+        </div>
       </div>
 
-      <div class="table-card">
-        <div class="tc-hdr"><h3>Fund Allocation Breakdown</h3></div>
-        <div class="table-wrap">
-          <table class="data-tbl">
-            <thead><tr><th>Category</th><th>Allocated (₹)</th><th>Utilized (₹)</th><th>Remaining (₹)</th><th>Utilization</th></tr></thead>
+      <div class="table-wrap">
+        <div class="table-head-bar"><h3>Fund Allocation Breakdown</h3><span class="badge-blue">4 Categories</span></div>
+        <div class="table-scroll">
+          <table class="pro-table">
+            <thead><tr><th>Category</th><th>Allocated</th><th>Used</th><th>Remaining</th><th>Utilization</th></tr></thead>
             <tbody>
-              <tr><td><span class="cat-tag blue-tag"><i class="fa-solid fa-brain"></i> AI Research</span></td><td>₹25,00,000</td><td>₹22,00,000</td><td>₹3,00,000</td><td><div class="ibar"><div class="ib-f blue-fill" style="--p:88%"></div><span>88%</span></div></td></tr>
-              <tr><td><span class="cat-tag green-tag"><i class="fa-solid fa-globe"></i> Web Infra</span></td><td>₹18,00,000</td><td>₹16,50,000</td><td>₹1,50,000</td><td><div class="ibar"><div class="ib-f green-fill" style="--p:92%"></div><span>92%</span></div></td></tr>
-              <tr><td><span class="cat-tag yellow-tag"><i class="fa-solid fa-users"></i> HR & Ops</span></td><td>₹20,00,000</td><td>₹17,00,000</td><td>₹3,00,000</td><td><div class="ibar"><div class="ib-f yellow-fill" style="--p:85%"></div><span>85%</span></div></td></tr>
-              <tr><td><span class="cat-tag red-tag"><i class="fa-solid fa-bullhorn"></i> Marketing</span></td><td>₹10,00,000</td><td>₹8,50,000</td><td>₹1,50,000</td><td><div class="ibar"><div class="ib-f red-fill" style="--p:85%"></div><span>85%</span></div></td></tr>
-              <tr><td><span class="cat-tag blue-tag"><i class="fa-solid fa-gavel"></i> Legal & IP</span></td><td>₹5,00,000</td><td>₹4,00,000</td><td>₹1,00,000</td><td><div class="ibar"><div class="ib-f blue-fill" style="--p:80%"></div><span>80%</span></div></td></tr>
+              <tr><td><span class="cat-pill blue-pill">Product Dev</span></td><td>₹20,00,000</td><td>₹18,50,000</td><td>₹1,50,000</td><td><div class="il-bar-wrap"><div class="il-bar-fill" style="width:92.5%;background:var(--blue)"></div></div><span>92.5%</span></td></tr>
+              <tr><td><span class="cat-pill green-pill">Operations</span></td><td>₹15,00,000</td><td>₹13,00,000</td><td>₹2,00,000</td><td><div class="il-bar-wrap"><div class="il-bar-fill" style="width:86.7%;background:var(--green)"></div></div><span>86.7%</span></td></tr>
+              <tr><td><span class="cat-pill yellow-pill">Marketing</span></td><td>₹5,00,000</td><td>₹4,50,000</td><td>₹50,000</td><td><div class="il-bar-wrap"><div class="il-bar-fill" style="width:90%;background:var(--yellow)"></div></div><span>90%</span></td></tr>
+              <tr><td><span class="cat-pill red-pill">R&amp;D / Patents</span></td><td>₹3,00,000</td><td>₹2,00,000</td><td>₹1,00,000</td><td><div class="il-bar-wrap"><div class="il-bar-fill" style="width:66.7%;background:var(--red)"></div></div><span>66.7%</span></td></tr>
             </tbody>
           </table>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ===== PATENTS PAGE ===== -->
-    <div class="page" id="page-patents">
-      <div class="ph">
-        <div class="ph-left"><h1>Patent Portfolio</h1><p>Intellectual property management · XBzin Ecosystem</p></div>
-        <div class="ph-right"><button class="btn b-primary" onclick="showAddPatentModal()"><i class="fa-solid fa-plus"></i> File New Patent</button></div>
-      </div>
-
-      <div class="pat-kpi-row">
-        <div class="pat-kpi green-top"><div class="pk-ic green-wrap"><i class="fa-solid fa-check-double"></i></div><span class="pk-n">3</span><span class="pk-l">Granted</span></div>
-        <div class="pat-kpi yellow-top"><div class="pk-ic yellow-wrap"><i class="fa-solid fa-hourglass-half"></i></div><span class="pk-n">1</span><span class="pk-l">Pending</span></div>
-        <div class="pat-kpi blue-top"><div class="pk-ic blue-wrap"><i class="fa-solid fa-layer-group"></i></div><span class="pk-n">4</span><span class="pk-l">Total</span></div>
-        <div class="pat-kpi red-top"><div class="pk-ic red-wrap"><i class="fa-solid fa-ban"></i></div><span class="pk-n">0</span><span class="pk-l">Rejected</span></div>
-      </div>
-
-      <div class="chart-row one-two">
-        <div class="chart-card donut-card">
-          <div class="cc-hdr"><h3>Patent Status</h3></div>
-          <div class="donut-wrap">
-            <canvas id="patPieChart"></canvas>
-            <div class="donut-center"><span class="dc-num">4</span><span class="dc-lbl">Total</span></div>
-          </div>
-          <div class="chart-legend">
-            <div class="cl-row"><span class="cl-dot" style="background:var(--green)"></span><span>Granted</span><strong>3</strong></div>
-            <div class="cl-row"><span class="cl-dot" style="background:var(--yellow)"></span><span>Pending</span><strong>1</strong></div>
-          </div>
-        </div>
-        <div class="patent-cards-grid" id="patentCards"></div>
-      </div>
-    </div>
-
-    <!-- ===== ECOSYSTEM PAGE ===== -->
-    <div class="page" id="page-ecosystem">
-      <div class="ph"><div class="ph-left"><h1>Ecosystem Modules</h1><p>Four core pillars of XBzin product ecosystem</p></div></div>
-      <div class="eco-grid" id="ecoGrid"></div>
-    </div>
-
-    <!-- ===== ANALYTICS PAGE ===== -->
-    <div class="page" id="page-analytics">
-      <div class="ph">
-        <div class="ph-left"><h1>Deep Analytics</h1><p>Comprehensive data insights</p></div>
-        <div class="ph-right">
-          <select class="cc-sel" id="analyticsRange" onchange="updateAnalytics(this.value)">
-            <option value="3">3 months</option>
-            <option value="6" selected>6 months</option>
-            <option value="12">12 months</option>
-          </select>
+    <!-- ═══ PATENTS ═══ -->
+    <section class="pg-section" id="patents">
+      <div class="section-header-row">
+        <div><h2 class="sec-h2">Patent Tracker</h2><p class="sec-p">Intellectual property portfolio — XBzin Ecosystem</p></div>
+        <div class="shr-actions">
+          <button class="btn-outline"><i class="fa-solid fa-file-export"></i> IP Report</button>
+          <button class="btn-primary" id="addPatentBtn"><i class="fa-solid fa-plus"></i> File New Patent</button>
         </div>
       </div>
-      <div class="chart-row two-two">
-        <div class="chart-card"><div class="cc-hdr"><h3>Revenue Growth Trend</h3></div><div class="chart-body"><canvas id="revenueChart"></canvas></div></div>
-        <div class="chart-card"><div class="cc-hdr"><h3>Team Headcount Growth</h3></div><div class="chart-body"><canvas id="teamChart"></canvas></div></div>
-      </div>
-      <div class="chart-row one-col">
-        <div class="chart-card"><div class="cc-hdr"><h3>Module Performance Radar</h3><p>Across 6 key metrics</p></div><div class="chart-body"><canvas id="radarChart"></canvas></div></div>
-      </div>
-    </div>
 
-    <!-- ===== TEAM PAGE ===== -->
-    <div class="page" id="page-team">
-      <div class="ph">
-        <div class="ph-left"><h1>Team Management</h1><p>16 professionals across XBzin Ecosystem</p></div>
-        <div class="ph-right"><button class="btn b-primary" onclick="showToast('Invite member feature coming soon','info')"><i class="fa-solid fa-user-plus"></i> Invite Member</button></div>
+      <div class="patent-summary-cards">
+        <div class="psc-card" style="--bc:var(--green)">
+          <div class="psc-icon green-icon-bg"><i class="fa-solid fa-check-double"></i></div>
+          <div class="psc-body"><p>Granted</p><strong>3 Patents</strong></div>
+          <div class="psc-ring green-ring">75%</div>
+        </div>
+        <div class="psc-card" style="--bc:var(--yellow)">
+          <div class="psc-icon yellow-icon-bg"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div class="psc-body"><p>Pending</p><strong>1 Patent</strong></div>
+          <div class="psc-ring yellow-ring">25%</div>
+        </div>
+        <div class="psc-card" style="--bc:var(--blue)">
+          <div class="psc-icon blue-icon-bg"><i class="fa-solid fa-layer-group"></i></div>
+          <div class="psc-body"><p>Total Filed</p><strong>4 Patents</strong></div>
+          <div class="psc-ring blue-ring">100%</div>
+        </div>
+      </div>
+
+      <div class="patent-cards-grid" id="patentGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ═══ ECOSYSTEM ═══ -->
+    <section class="pg-section" id="ecosystem">
+      <div class="section-header-row">
+        <div><h2 class="sec-h2">Ecosystem Modules</h2><p class="sec-p">4 core pillars powering the XBzin product ecosystem</p></div>
+        <div class="shr-actions">
+          <button class="btn-outline"><i class="fa-solid fa-arrows-rotate"></i> Sync Status</button>
+        </div>
+      </div>
+      <div class="eco-modules-grid" id="ecoGrid"></div>
+    </section>
+
+    <!-- ═══ TEAM ═══ -->
+    <section class="pg-section" id="team">
+      <div class="section-header-row">
+        <div><h2 class="sec-h2">Team Directory</h2><p class="sec-p">16 active members across 4 ecosystem modules</p></div>
+        <div class="shr-actions">
+          <button class="btn-primary"><i class="fa-solid fa-user-plus"></i> Add Member</button>
+        </div>
       </div>
       <div class="team-grid" id="teamGrid"></div>
-    </div>
+    </section>
 
-    <!-- ===== SETTINGS PAGE ===== -->
-    <div class="page" id="page-settings">
-      <div class="ph"><div class="ph-left"><h1>Settings</h1><p>Customize your XBzin Dashboard experience</p></div></div>
-      <div class="settings-wrap">
-        <div class="settings-tabs" id="settingsTabs">
-          <button class="stab active" data-tab="general">General</button>
-          <button class="stab" data-tab="appearance">Appearance</button>
-          <button class="stab" data-tab="notifications">Notifications</button>
-          <button class="stab" data-tab="security">Security</button>
+    <!-- ═══ ACTIVITY ═══ -->
+    <section class="pg-section" id="activity">
+      <div class="section-header-row">
+        <div><h2 class="sec-h2">Activity Log</h2><p class="sec-p">Real-time ecosystem event feed</p></div>
+        <div class="shr-actions">
+          <button class="btn-outline" id="clearActivityBtn"><i class="fa-solid fa-trash"></i> Clear Log</button>
+          <button class="btn-primary" id="addActivityBtn"><i class="fa-solid fa-plus"></i> Add Event</button>
         </div>
-        <div class="settings-body" id="settingsBody"></div>
       </div>
-    </div>
+      <div class="activity-feed-wrap" id="activityFeed"></div>
+    </section>
 
-    <!-- ===== REPORTS PAGE ===== -->
-    <div class="page" id="page-reports">
-      <div class="ph"><div class="ph-left"><h1>Reports</h1><p>Generate, download and share ecosystem reports</p></div></div>
-      <div class="reports-grid">
-        <div class="report-card" onclick="downloadReport('Financial Report')"><div class="rc-icon blue-wrap"><i class="fa-solid fa-file-invoice-dollar"></i></div><h4>Financial Report</h4><p>Complete funding, investment & utilization data</p><button class="btn b-ghost sm-btn">Generate <i class="fa-solid fa-download"></i></button></div>
-        <div class="report-card" onclick="downloadReport('Projects Report')"><div class="rc-icon green-wrap"><i class="fa-solid fa-diagram-project"></i></div><h4>Projects Report</h4><p>All projects with status, priority and progress</p><button class="btn b-ghost sm-btn">Generate <i class="fa-solid fa-download"></i></button></div>
-        <div class="report-card" onclick="downloadReport('Patent Portfolio')"><div class="rc-icon yellow-wrap"><i class="fa-solid fa-file-shield"></i></div><h4>Patent Portfolio</h4><p>IP status, filings and pending applications</p><button class="btn b-ghost sm-btn">Generate <i class="fa-solid fa-download"></i></button></div>
-        <div class="report-card" onclick="downloadReport('Team Report')"><div class="rc-icon red-wrap"><i class="fa-solid fa-users"></i></div><h4>Team Report</h4><p>Employee roster, roles and department data</p><button class="btn b-ghost sm-btn">Generate <i class="fa-solid fa-download"></i></button></div>
-        <div class="report-card" onclick="downloadReport('Analytics Report')"><div class="rc-icon blue-wrap"><i class="fa-solid fa-chart-mixed"></i></div><h4>Analytics Report</h4><p>Deep metrics, trends and performance insights</p><button class="btn b-ghost sm-btn">Generate <i class="fa-solid fa-download"></i></button></div>
-        <div class="report-card" onclick="downloadReport('Full Ecosystem Report')"><div class="rc-icon green-wrap"><i class="fa-solid fa-file-pdf"></i></div><h4>Full Ecosystem Report</h4><p>Complete XBzin ecosystem overview (all data)</p><button class="btn b-primary sm-btn">Generate <i class="fa-solid fa-download"></i></button></div>
+    <!-- ═══ SETTINGS ═══ -->
+    <section class="pg-section" id="settings">
+      <div class="section-header-row">
+        <div><h2 class="sec-h2">Dashboard Settings</h2><p class="sec-p">Customize your admin experience</p></div>
       </div>
-    </div>
+      <div class="settings-layout">
+        <div class="settings-card">
+          <h3 class="sc-h"><i class="fa-solid fa-palette"></i> Appearance</h3>
+          <div class="setting-row"><div><p class="sr-lbl">Dark Mode</p><p class="sr-desc">Toggle dark/light theme</p></div><label class="toggle"><input type="checkbox" id="darkModeToggle"/><span class="t-track"><span class="t-thumb"></span></span></label></div>
+          <div class="setting-row"><div><p class="sr-lbl">Compact Sidebar</p><p class="sr-desc">Icon-only sidebar mode</p></div><label class="toggle"><input type="checkbox" id="compactSidebarToggle"/><span class="t-track"><span class="t-thumb"></span></span></label></div>
+          <div class="setting-row"><div><p class="sr-lbl">Animations</p><p class="sr-desc">Smooth UI transitions</p></div><label class="toggle"><input type="checkbox" id="animToggle" checked/><span class="t-track"><span class="t-thumb"></span></span></label></div>
+        </div>
+        <div class="settings-card">
+          <h3 class="sc-h"><i class="fa-solid fa-bell"></i> Notifications</h3>
+          <div class="setting-row"><div><p class="sr-lbl">Project Alerts</p><p class="sr-desc">Project status changes</p></div><label class="toggle"><input type="checkbox" checked/><span class="t-track"><span class="t-thumb"></span></span></label></div>
+          <div class="setting-row"><div><p class="sr-lbl">Financial Updates</p><p class="sr-desc">Funding & investment alerts</p></div><label class="toggle"><input type="checkbox" checked/><span class="t-track"><span class="t-thumb"></span></span></label></div>
+          <div class="setting-row"><div><p class="sr-lbl">Patent Updates</p><p class="sr-desc">Patent filing status</p></div><label class="toggle"><input type="checkbox" checked/><span class="t-track"><span class="t-thumb"></span></span></label></div>
+        </div>
+        <div class="settings-card">
+          <h3 class="sc-h"><i class="fa-solid fa-database"></i> Data & Export</h3>
+          <div class="setting-row"><div><p class="sr-lbl">Auto-refresh Charts</p><p class="sr-desc">Refresh every 30 seconds</p></div><label class="toggle"><input type="checkbox" id="autoRefreshToggle"/><span class="t-track"><span class="t-thumb"></span></span></label></div>
+          <div class="setting-btn-row">
+            <button class="btn-outline w-full" id="exportAllBtn"><i class="fa-solid fa-file-export"></i> Export Full Report</button>
+            <button class="btn-outline w-full danger-btn" id="resetBtn"><i class="fa-solid fa-rotate-left"></i> Reset Dashboard</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
   </main>
 
-  <footer class="footer">
-    <p>&copy; 2025 <strong>XBzin Ecosystem</strong> · Bharat Shukla, Founder & CEO</p>
-    <p id="footerClock"></p>
+  <!-- FOOTER -->
+  <footer class="footer-pro">
+    <div class="fp-left">
+      <div class="fp-logo-mark"><i class="fa-solid fa-hexagon-nodes"></i> <strong>XBzin</strong></div>
+      <p>&copy; 2025 XBzin Ecosystem. All rights reserved. Founded by <strong>Bharat Shukla</strong>.</p>
+    </div>
+    <div class="fp-right">
+      <span class="fp-sys-status"><span class="fp-green-dot"></span> All Systems Operational</span>
+      <span>Admin Dashboard v2.0</span>
+    </div>
   </footer>
+
+</div><!-- /main-wrapper -->
+
+<!-- Chart Expand Modal -->
+<div class="chart-expand-modal hidden" id="chartExpandModal">
+  <div class="cem-backdrop" onclick="closeExpandModal()"></div>
+  <div class="cem-box">
+    <div class="cem-head">
+      <h3 id="cemTitle">Chart</h3>
+      <button onclick="closeExpandModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="cem-body"><canvas id="expandedChartCanvas"></canvas></div>
+  </div>
 </div>
 
 <script src="script.js"></script>
